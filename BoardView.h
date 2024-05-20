@@ -27,8 +27,8 @@ public:
     void set_scale (double s); // BoardView의 스케일을 s로 설정
     void set_size (int s); // 출력되는 화면의 크기를 s로 설정
     void clear();
-    void plot(Peasant peasant_object);
-    void plot(Soldier soldier_object);
+    void plot(Peasant peasant_object); // 다형성 적용 전 구현 함수, 더 이상 안 씀
+    void plot(Soldier soldier_object); // 다형성 적용 전 구현 함수, 더 이상 안 씀
     void plot(Person * object);
     void draw();
 };
