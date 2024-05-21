@@ -63,6 +63,10 @@ void Game_World::add_object(Person *ptr) { // 완성할 것, 완성한 듯?
         }
 
     } else {
+        if(ptr != nullptr) {
+            delete ptr;
+            ptr = nullptr;
+        }
         cout<< "there is no space to add new object" << endl;
     }
 }
