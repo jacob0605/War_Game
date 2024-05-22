@@ -1,3 +1,4 @@
+# 첫번째로 쓴 makefile
 CC = g++
 SRC = Real_Pair.cpp Person.cpp Peasant.cpp Warrior.cpp Soldier.cpp Archer.cpp BoardView.cpp Game_World.cpp main.cpp
 OBJ = $(SRC:.cpp=.o)
@@ -7,6 +8,22 @@ $(EXEC): $(OBJ)
 	$(CC) -o $@ $^
 
 %.o: %.cpp %.h
+	$(CC) -c $<
+
+clean:
+	del $(OBJ) War_Game.exe
+
+# 두번째로 쓴 makefile -> 이거 안됨
+CC = g++
+SRC_DIR = War_Game  # 소스 파일이 있는 디렉터리
+SRC = $(wildcard $(SRC_DIR)/*.cpp)
+OBJ = $(SRC:.cpp=.o)
+EXEC = War_Game
+
+$(EXEC): $(OBJ)
+	$(CC) -o $@ $^
+
+%.o: %.cpp
 	$(CC) -c $<
 
 clean:

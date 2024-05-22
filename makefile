@@ -1,13 +1,12 @@
 CC = g++
-SRC_DIR = War_Game  # 소스 파일이 있는 디렉터리
-SRC = $(wildcard $(SRC_DIR)/*.cpp)
+SRC = Real_Pair.cpp Person.cpp Peasant.cpp Warrior.cpp Soldier.cpp Archer.cpp BoardView.cpp Game_World.cpp main.cpp
 OBJ = $(SRC:.cpp=.o)
 EXEC = War_Game
 
 $(EXEC): $(OBJ)
 	$(CC) -o $@ $^
 
-%.o: %.cpp
+%.o: %.cpp %.h
 	$(CC) -c $<
 
 clean:
