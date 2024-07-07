@@ -4,11 +4,13 @@
 #include <cmath>
 #include <cctype>
 
+#include "Console.h"
 
 #include "Peasant.h"
 #include "Soldier.h"
 #include "Archer.h"
 #include "main.h"
+#include <conio.h>
 
 #define maxsize 20
 
@@ -92,6 +94,8 @@ int main() { //
         // b1.plot(o4);
         // b1.draw(); // 게임보드 출력
         // cout<<endl;
+        Console::clrscr();
+        Console::gotoxy(1, 1);
         draw_board(b1, time, g1);
         cout<<"Enter command(press 'h' to view command list): ";
         cin>> command; // 명령어 입력
@@ -166,6 +170,14 @@ int main() { //
                 cout<<"wrong input, enter right command"<<endl;
                 cout<<"input 'h' to show command list"<<endl;
                 break;
+        }
+
+        while (true) {
+            command = _getch(); // 입력 대기
+
+            if (command == '\t') { // 탭 키를 입력하면 while 루프를 벗어나고 다시 게임 보드 출력
+                break;
+            }
         }
 
     }

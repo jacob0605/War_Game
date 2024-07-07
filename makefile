@@ -1,5 +1,5 @@
 CC = g++
-SRC = Real_Pair.cpp Person.cpp Peasant.cpp Warrior.cpp Soldier.cpp Archer.cpp BoardView.cpp Game_World.cpp main.cpp
+SRC = Real_Pair.cpp Person.cpp Peasant.cpp Warrior.cpp Soldier.cpp Archer.cpp BoardView.cpp Game_World.cpp main.cpp Console.cpp
 OBJ = $(SRC:.cpp=.o)
 EXEC = War_Game
 

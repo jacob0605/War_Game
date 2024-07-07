@@ -2,3 +2,4 @@
 *.exe
 *.svd
 *.log
+*backup.txt
