@@ -28,3 +28,24 @@ $(EXEC): $(OBJ)
 
 clean:
 	del $(OBJ) War_Game.exe
+
+# 세번째로 쓴 makefile -> 되긴하는거 같은데 결국 실행은 안됨
+
+# 현재 디렉토리 내 모든 .cpp 파일을 찾아서 SRC 변수에 할당
+SRC := $(wildcard *.cpp)
+
+# 나머지 Makefile 내용 예시
+OBJ := $(SRC:.cpp=.o)
+CXX := g++
+CXXFLAGS := -Wall -g
+
+all: my_program.exe
+
+my_program.exe: $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+clean:
+	del /Q $(OBJ) my_program.exe

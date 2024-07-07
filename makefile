@@ -10,4 +10,4 @@ $(EXEC): $(OBJ)
 	$(CC) -c $<
 
 clean:
-	del $(OBJ) War_Game.exe
+	del $(OBJ) War_Game.exe Game.log
