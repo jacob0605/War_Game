@@ -21,7 +21,9 @@ Game_World::Game_World() {
 
 Game_World::~Game_World() {
     clear();
-    cout<< "Game_World destructor called" << endl; // 확인용 코드
+    #ifdef _DEBUG
+        cout<< "Game_World destructor called" << endl; // 확인용 코드
+    #endif // _DEBUG
 }
 
 void Game_World::set_num_objects(int num) {

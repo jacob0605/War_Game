@@ -5,10 +5,10 @@
 #ifndef	__CONSOL__
 #define	__CONSOL__
 
-#ifdef	_WINDOWS
+// #ifdef	_WINDOWS
 	#include <windows.h>
 	#include <conio.h>
-#endif	//	_WINDOWS
+// #endif	//	_WINDOWS
 
 // void clrscr(void);              // clear screen
 // void gotoxy(int x, int y);     // move cursor to (x, y) coordinate

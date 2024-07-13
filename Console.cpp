@@ -10,7 +10,7 @@
 
 #include "Console.h"
 
-#ifdef _WINDOWS
+// #ifdef _WINDOWS
 // for windows
 
 #include <windows.h>
@@ -72,7 +72,7 @@ void Console::MyPause()
 	system("PAUSE");
 }
 
-#endif	// _WINDOWS
+// #endif	// _WINDOWS
 
 
 

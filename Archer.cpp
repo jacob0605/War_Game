@@ -72,7 +72,10 @@ void Archer::update() {
     */
     // if(health > 0 && is_moving==true) {
 
-    cout<< "Archer class update function called" << endl;
+    #ifdef _DEBUG
+        cout<< "Archer class update function called" << endl;
+    #endif // _DEBUG
+    
 
     if(get_alive()) {
         if(is_attacking) {
@@ -103,7 +106,12 @@ void Archer::update() {
                 if(world_ptr->get_object_ptr(i)->get_alive()) {
                     if(i != this_id) {
                         d = distance(this->get_location(), world_ptr->get_object_ptr(i)->get_location());
-                        cout<<"\t\t d: "<< d << endl;
+
+                        // 디버그 모드 활성화 시 대상과의 거리 d 출력
+                        #ifdef _DEBUG
+                            cout<<"\t\t d: "<< d << endl;
+                        #endif // _DEBUG
+                        
                         if(d <= min_d) {
                             min_d = d;
                             target_id = i;
@@ -153,7 +161,7 @@ Soldier 객체의 현재 상태에 대한 정보를 출력한다. 예컨대 아�
             cout<< "Not moving" << endl;
         }
         cout<<"Attack point is "<< attack_point <<endl;
-        cout<<"Range is "<< attack_point <<endl;
+        cout<<"Range is "<< range <<endl;
         if(is_attacking) {
             cout<< "Attacking, target id is " << target << endl;
         } else {

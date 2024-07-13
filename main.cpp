@@ -84,7 +84,9 @@ int main() { //
     int size = 0; // 게임보드 사이즈 변경용 변수
     int time = 1; // 시뮬레이터 시각, 기본값 1로 설정
     double x=0, y=0;
+    bool shouldStop = true;
     while(flag) {
+        shouldStop = true;
         // cout<<endl;
         // cout<<"Time: "<<time<<endl; // 시뮬레이터 시각 출력
         // b1.clear();
@@ -96,65 +98,95 @@ int main() { //
         // cout<<endl;
         Console::clrscr();
         Console::gotoxy(1, 1);
+        #ifdef _DEBUG
+            cout<<"DEBUG keyword: true"<<endl;
+        #endif // _DEBUG
         draw_board(b1, time, g1);
         cout<<"Enter command(press 'h' to view command list): ";
         cin>> command; // 명령어 입력
         command = tolower(command); // 대문자로 입력시 소문자로 전환
         switch(command) { // 각 명령어 작동 확인시 cout<<"command (command)"<<endl; 주석처리할것.
             case 'm': // "move" 명령어, id_num = ID인 객체의 위치를 (x,y)로 이동
-                // cout<<"command m"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command m"<<endl;
+                #endif // _DEBUG
                 do_move_command(log_file, g1);
                 break;
             case 'c': // "carry" 명령어, id_num = ID인 객체에 w란 양의 부하를 인가
-                // cout<<"command c"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command c"<<endl;
+                #endif // _DEBUG
                 set_load_to_Peasant(log_file, g1);
                 break;
             case 's': // "show status" 명령어, id_num = ID인 객체의 상태를 출력
+                #ifdef _DEBUG
+                    cout<<"command s"<<endl;
+                #endif // _DEBUG
                 // cout<<"command s"<<endl;
                 show_status(log_file, g1);
                 break;
             case 'g': // "go" 명령어, 시뮬레이터의 시각을 한단계 전진
-                // cout<<"command g"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command g"<<endl;
+                #endif // _DEBUG
                 // time++;
                 go_command(log_file, time, g1);
                 break;
             case 'z': // "zoom" 명령어, 게임보드의 출력 눈금 축적을 s로 설정
-                // cout<<"command z"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command z"<<endl;
+                #endif // _DEBUG
                 cin>> scale;
                 b1.set_scale (scale); // BoardView의 스케일을 s로 설정
                 break;
             case 'o': // "origin" 명령어, 게임보드의 원점을 (x,y)로 설정
-                // cout<<"command o"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command o"<<endl;
+                #endif // _DEBUG
                 cin>> x >> y;
                 b1.set_origin(x,y);
                 break;
             case 'r': // "resize" 명령어, 한 눈금의 크기를 s로 설정
-                // cout<<"command r"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command r"<<endl;
+                #endif // _DEBUG
                 cin>> size;
                 b1.set_size(size); // 출력되는 화면의 크기를 s로 설정
                 break;
             case 'n': // "new" 명령어, 새 객체를 추가
-                cout<<"command n"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command n"<<endl;
+                #endif // _DEBUG
                 add_command(log_file, g1);
                 break;
             case 'v': // "save" 명령어, 현재 게임의 상태를 파일에 저장
-                cout<<"command v"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command v"<<endl;
+                #endif // _DEBUG
                 save_data(log_file, g1);
                 break;
             case 'l': // "load" 명령어, 이전에 파일에 저장한 내용을 불러들여 게임을 이전 상태로 복귀
-                cout<<"command l"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command l"<<endl;
+                #endif // _DEBUG
                 load_data(log_file, g1);
                 break;
             case 'a': // "attack" 명령어, id1의 객체로 하여금 id2 객체를 공격하도록 명령을 내린다
-                cout<<"command a"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command a"<<endl;
+                #endif // _DEBUG
                 attack(log_file,g1);
                 break;
             case 'h': // 명령어 리스트 보기용, 게임에 주로 있는 help 명령어
-                // cout<<"command h"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command h"<<endl;
+                #endif // _DEBUG
                 show_command_list();
                 break;
             case 'q': // "quit" 명령어, 프로그램 종료
-                // cout<<"command q"<<endl;
+                #ifdef _DEBUG
+                    cout<<"command q"<<endl;
+                #endif // _DEBUG
                 cout<<"quit program"<<endl;
                 log_file<<"quit program"<<endl;
                 // 메모리 반납
@@ -162,6 +194,7 @@ int main() { //
                 // 파일 닫기
                 log_file.close();
                 flag = false;
+                shouldStop = false;
                 break;
             // case 't': // 기능 작동 확인용 임시 명령어
             //     cout<<"command t"<<endl;
@@ -170,20 +203,22 @@ int main() { //
                 cout<<"wrong input, enter right command"<<endl;
                 cout<<"input 'h' to show command list"<<endl;
                 break;
-        }
+        } // switch(command) 끝
 
-        while (true) {
-            command = _getch(); // 입력 대기
-
-            if (command == '\t') { // 탭 키를 입력하면 while 루프를 벗어나고 다시 게임 보드 출력
-                break;
+        if(shouldStop) {
+            cout<<"Enter 'tab' to continue\n";
+            while (true) {
+                command = _getch(); // 입력 대기
+                if (command == '\t') { // 탭 키를 입력하면 while 루프를 벗어나고 다시 게임 보드 출력
+                    break;
+                }
             }
-        }
+        } // if(shouldStop) 끝
 
-    }
+    } // while(flag) 끝
 
     return 0;
-}
+} // main() 끝
 
 bool is_right_id(Game_World & G1, int id) { // 입력한 id가 적절한 id인지 검사하는 함수
     /*
@@ -352,7 +387,9 @@ void dynamic_memory_allocate(ofstream & log_file, Game_World & G1, char type, do
     // 함수의 타입을 void로 해서 하는게 좋을까 아니면 Person * 타입으로 해서 리턴값을 가지게 하는 게 좋을까.
     // void로 하고 메모리 동적 할당 후 바로 G1의 add_object에 인자로 넘겨서 추가하는게 좋을듯.
 
-    cout<< "Dynamic memory allocate function called" << endl;
+    #ifdef _DEBUG
+        cout<< "Dynamic memory allocate function called" << endl;
+    #endif // _DEBUG
     log_file<< "Dynamic memory allocate function called" << endl;
 
     Person * ptr = nullptr;

@@ -85,7 +85,10 @@ void Warrior::attack_command(int target_id) {
     단지 공격할 수 없다는 메시지만을 화면에 출력시킨다.
     */
 
-    cout<< "attack command is called" << endl;
+    #ifdef _DEBUG
+        cout<< "attack command is called" << endl;
+    #endif // _DEBUG
+
     // double distance(Real_Pair r1, Real_Pair r2); // 두 점간의 Cartesian (ordinary) distance를 계산하여 반환
     if(this->get_alive() && world_ptr->get_object_ptr(target_id)->get_alive()) {
         if(distance(this->get_location(), world_ptr->get_object_ptr(target_id)->get_location()) <= range) {

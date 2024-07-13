@@ -49,3 +49,23 @@ my_program.exe: $(OBJ)
 
 clean:
 	del /Q $(OBJ) my_program.exe
+
+
+
+이 밑에 있는게 원래 쓰던거에 화면출력용 Console 컴파일 할때 쓰는 키워드 붙인거
+
+CC = g++
+SRC = Real_Pair.cpp Person.cpp Peasant.cpp Warrior.cpp Soldier.cpp Archer.cpp BoardView.cpp Game_World.cpp main.cpp Console.cpp
+OBJ = $(SRC:.cpp=.o)
+EXEC = War_Game
+
+$(EXEC): $(OBJ)
+	$(CC) -o $@ $^ -D_WINDOWS
+
+%.o: %.cpp %.h
+	$(CC) -c $< -D_WINDOWS
+
+clean:
+	del $(OBJ) War_Game.exe Game.log
+
+	
