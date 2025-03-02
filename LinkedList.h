@@ -3,6 +3,12 @@
 
 #include <iostream>
 
+// 전방 선언
+template <typename T>
+class Linked_List;
+template <typename T>
+class Linked_List_Iterator;
+
 // 노드 클래스
 template <typename T>
 class Linked_List_Node {
@@ -15,10 +21,6 @@ private:
     Linked_List_Node(T d) : data(d), prev(nullptr), next(nullptr) {}
     ~Linked_List_Node() { std::cout << "Node " << data << " deleted" << std::endl; }
 };
-
-// 이터레이터 클래스 선언 (전방 선언)
-template <typename T>
-class Linked_List_Iterator;
 
 // 링크드 리스트 클래스
 template <typename T>
