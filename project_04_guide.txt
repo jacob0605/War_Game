@@ -1,0 +1,467 @@
+
+4. 프로젝트 #4 : 템플릿, 예외처리, 동적 데이터를 가진 객체
+
+    4.1 프로젝트의 목적
+        프로젝트 #3에서 완성한 내용에 최종 손질을 하려고 한다.
+        다음의 C++ 객체지향 프로그램의 마지막 주요 기능을 연습하고자 한다.
+
+        - 동적 데이터(dynamic data)를 포함한 객체
+        - 소멸자 (destructor)
+        - 복사 생성자 (copy constructor)
+        - 치환 연산자 중첩 (assignment operator overloading)
+        - 예외 처리 (exception)를 이용한 에러처리
+        - 템플릿 (template) 을 사용하여 이진트리나 연결리스트 (linked list) 등의 범용 자료구조 만들기
+            (템플릿을 이용한 클래스 선언은 임의 타입의 자료구조를 담을 수 있으며 컴파일시에는 타입의 검사를 해주므로 재사용 소프트웨어 컴포넌트로 활용됨)
+            표준 C++ 라이브러리에 있는 것과 비슷한 방식으로 이 과제에서는 양방향 연결 리스트 컨테이너 클래스를 만들어 볼 것이다.
+    
+    4.2 프로젝트의 개요
+
+        단계 1
+
+            범용 연결리스트 템플릿 클래스를 구현한다.
+            이 클래스만 프로젝트 #3과는 별도로 코딩하고 테스트하여 검증하다.
+
+        단계 2
+
+            Person 객체에 동적으로 할당되는 문자열을 이용해서 이름을 부여한다.
+            객체의 이름은 생성 시 사용자에 의해서 주어진다.
+            Person 클래스에 소멸자 (destructor) 를 추가한다.
+            소멸자는 간단한 메시지를 출력함으로써 소멸자가 사용자에게 적절하게 실행되고 있음을 확인시켜준다.
+            display_status 함수도 객체의 이름을 출력하도록 필요하다면 손을 보라.
+
+        단계 3
+
+            Game_World 클래스를 갱신한다.
+            프로젝트 #3에서의 Person 객체의 포인터 배열 대신에 단계 1에서 만든 범용 연결 리스트를 사용하라.
+            이러한 변화에 맞게 Game_World 클래스의 여러곳을 수정하라.
+            display_all_objects() 함수를 Game_Word에 추가한다. 이 함수는 게임 내의 모든 객체들에 대해서 객체의 이름 순으로 출력한다.
+            이 함수를 실행한 새로운 명령어도 추가한다.
+
+        단계 4
+
+            사용자 입력 오류에 대한 예외 처리를 위한 클래스를 설정한다.
+            이를 이용해서 기존의 입력 오류 처리 부분을 다시 작성한다.
+
+        단계 5
+
+            Observer 라는 마지막 클래스를 하나 더 추가한다.
+            이 객체는 연결 리스트 상의 모든 객체들을 방문하고 그 결과를 보고하는 역할을 한다.
+
+    4.3 단계 1 : 양방향 연결 리스트 클래스 구현
+
+        4.3.1 개요
+
+            범용 양방향 리스트를 재사용 가능하도록 구현하는 것이 이 단계의 목표이다.
+            임의의 자료구조의 객체를 데이터로 저장할 수 있도록 하기 위해서 template을 사용하여 클래스를 정의해야 한다.
+            리스트의 맨앞이나 맨뒤에 모두 삽입할 수 있다.
+            리스트를 대상으로 하는 연산은 리스트의 내부구조를 알 필요가 없도록 Iterator 객체를 통해서 이우러진다.
+            Iterator 객체는 한 리스트에 대해서 개수에 제한 없이 생성할 수 있도록 해서 Iterator 만으로 자유로운 리스트 연산이 가능하다.
+
+            아래에 주어진 사양을 만족시키도록 코딩하되, 처음부터 template으로 구현하려고 하지 말라.
+            처음에는 범용 타입 T 대신에 int나 char 등의 데이터 타입에 대해서 연결 리스트 클래스를 만들도록 하라.
+            이것이 성공하고 나면 template 버전으로 옮겨가라.
+
+        4.3.2 전체 구조
+
+            Linked_List_Node, Linked_List_Iterator, Linked_List 의 세개의 클래스로 구성된다.
+            이 세개의 클래스를 모두 하나의 파일로 구현한다.
+            Linked_List_Node 는 데이터를 저장하고 있는 노드이고, Linked_List 는 노드 객체에 대한 포인터들을 관리한다.
+            Linked_List_Iterator 는 Linked_List 내의 "현재" 노드를 가리킨다.
+            이 Linked_List_Iterator 를 이용해서 리스트의 내부 구조를 신경쓰지 않고도 Linked_List 내의 각 노드들을 차례로 방문할 수 있다.
+            하나의 동일 Linked_List 객체에 관련된 여러 개의 Linked_List_Iterator 객체를 둘 수 있어서, 검색, 비교, 소팅 등을 자유롭게 할 수 있다.
+            다음 그림은 이들 3개 클래스 객체의 관계를 도식화해서 보여준다.
+
+        4.3.3 Linked_List_Node 클래스
+
+            T 타입의 저장할 데이터의 값 자체를 가지고 있는 클래스이다.
+            Linked_List 와 Linked_List_Iterator 클래스와 함께 양방향 연결 리스트를 구현하기 위한 클래스이다.
+            이 클래스는 public 멤버가 없다.
+            그러나, 다른 두 클래스에서 이 클래스 멤버들에 접근할 수 있도록 하기 위해서,
+            Linked_List 와 Linked_List_Iterator를 이 클래스의 friend 클래스로 선언한다.
+            이 클래스의 복사 생성자와 치환 연산자도 private으로 선언하여 외부에서 이 클래스 객체를 복사하지 못하도록 한다.
+
+        4.3.4 Linked_List_Iterator 클래스
+
+            이 클래스는 내부의 포인터 멤버 변수를 이용해서 Linked_List 내의 어느 노드 (Linked_List_Node 객체)가 "현재" 노드인지를 기억하고,
+            다음번 노드를 차례대로 따라가도록 하는데 필요한 기능을 가진다.
+            이 클래스의 public 멤버 함수들은 다음과 같은 것들이 필요하다.
+
+            [Public members]
+            
+                Linked_List_Iterator(Linked_List<T> & list);
+                    생성자. 주어진 Linked_List로부터 초기화한다.
+                    Linked_List의 첫 노드를 Iterator가 가리키도록 하고, Linked_List의 주소 값을 기억한다.
+                    이 주소는 뒤에 Linked_List의 멤버들을 접근하는데 사용된다.
+                
+                void advance();
+                    Iterator가 Linked_List 상의 다음번 노드를 가리키도록 한다.
+                    현재 마지막 노드를 가리키고 있다면 NULL이 된다.
+                    현재 NULL을 가리키고 있다면, Linked_List의 첫노드를 가리킨다.
+
+                bool at_end();
+                    Iterator가 현재 가리키는 노드의 주소가 NULL이면 true를 반환하고,
+                    NULL이 아니면 true를 반환한다.
+
+                void remove_at_iterator();
+                    Iterator가 현재 가리키고 있는 노드를 삭제하고 그 노드가 차지한 기억장소를 delete 연산으로 시스템에 반환한다.
+                    Iterator는 삭제되는 노드 다음의 노드를 가리키도록 갱신된다.
+
+                void insert_before_iterator(T & new_datum);
+                    Iterator가 현재 가리키고 있는 노드의 바로 앞에 데이터 값 new_datum을 가진 새로운 노드를 삽입한다.
+                    새로운 기억 장소를 할당받아야 하고, 이때 Linked_List_Node의 생성자가 호출된다.
+
+                T access_at_iterator();
+                    현재 Iterator가 가리키고 있는 Linked_List_Node 객체에 저장된 데이터 값이 반환된다.
+
+                void reset_from_list(Linked_List<T> & list);
+                    인자로 주어진 Linked_List 객체의 정보에 따라서 Iterator의 멤버들을 초기화한다.
+
+                void invalidate();
+                    Iterator가 현재 가지고 있는 Linked_List 포인터 값을 NULL로 변경하여,
+                    더 이상 현재의 Linked_List의 Iterator가 아님을 표시한다. 가리키고 있던 Linked_List가 더 이상 존재하지 않게 되면
+                    이 함수의 실행이 필요하다.
+
+                기본 생성자, 복사 생성자, 치환 연산자 등은 외부에서 사용하지 못하도록 막기 위해서 private으로 선언하여야 한다.
+
+        4.3.5 Linked_List 클래스
+
+            이 클래스의 public 멤버들은 다음과 같다.
+
+            Linked_List();
+                이 클래스의 기본 생성자이다. 내부 변수들을 초기화한다.
+
+            Linked_List(const Linked_List<T> & source);
+                Linked_List 객체를 위한 복사 생성자의 선언이다. source로 주어진 Linked_List의 내용을 그대로 복사하여 새로운 연결 리스트를 만든다.
+                함수의 인자나 반환값으로 Linked_List가 사용될 때 새로운 객체를 만들기 위해서 호출된다.
+
+            Linked_List & operator=(const Linked_List<T> & source);
+                Linked_List 객체를 위한 치환 연산자 정의이다.
+                기존의 연결 리스트를 모두 반환한 다음에 source로부터 노드 리스트를 읽어서 그대로 복사한다.
+                이 함수로 인해 다음과 같은 연산이 가능하다.
+
+                    Linked_List<Person> list1, list2;
+                     ...
+                    list1 = list2;
+
+            ~Linked_List();
+                Linked_List 객체의 소멸자이다.
+                이 리스트가 가지고 있는 모든 Linked_List_Node 객체들을 시스템에 반환해야 한다.
+
+            void add_at_front(T & new_datum);
+                연결 리스트의 맨 앞에 새로운 노드를 추가하는 함수이다.
+
+            void add_at_front(T & new_datum, Linked_List_Iterator<T> & iter);
+                연결 리스트의 맨 앞에 새로운 노드를 추가하고, 인자로 주어진 Iterator가 이 새로운 노드를 가리키도록 한다.
+
+            void add_at_back(T & new_datum);
+                연결 리스트의 맨 뒤에 새로운 노드를 추가하는 함수이다.
+
+            void add_at_back(T & new_datum, Linked_List_Iterator<T> & iter);
+                연결 리스트의 맨 뒤에 새로운 노드를 추가하고, 인자로 주어진 Iterator가 이 새로운 노드를 가리키도록 한다.
+
+            int get_List_length();
+                연결 리스트의 길이 (Linked_List_Node 객체의 개수) 를 반환한다.
+
+        4.3.6 연결 리스트 구현 힌트
+
+            아래 함수는 Linked_List_Iterator를 이용하여 Linked_List의 모든 노드들을 탐색하는 방법을 보여주고 있다.
+            이 함수는 Linked_List 상의 모든 노드의 값을 출력한다.
+
+            template<class T>
+            void display_list(T val, Linked_List<T> & list) {
+                Linked_List_Iterator<T> iter(list);
+
+                while(iter.at_end() == false) {
+                    cout << iter.access_at_iterator() << ';' << endl;
+                    iter.advance();
+                }
+            }
+
+            이 단계에서는 template 문법과 양방향 리스트의 알고리즘 구현의 두가지 과업이 동시에 주어진 셈이다.
+            따라서, 처음부터 template 버전으로 양방향 리스트를 만들려고 하지 말고,
+            int 나 char 등의 간단한 데이터 형으로 저장하는 데이터 타입을 고정한 버전으로 클래스를 만들어서 먼저 양방향 연결 리스트의 동작을 구현한다.
+            클래스 형태와 알고리즘 자체에 대한 디버깅 목적으로 간단한 대화형 프로그램을 작성하라.
+            기본 자료형에 대한 동적 점검이 끝난 후에야 template 버전으로 만들어라.
+            다음은 int 형을 위한 양방향 연결 리스트 클래스의 소스 코드이다. 아래 주어진 코드는 클래스 정의가 있는 헤더 파일이다.
+            코드를 보면 Linked_List_Iterator 와 Linked_List 가 Linked_List_Node 클래스에서 friend로 선언되어 있음을 볼 수 있다.
+            또한, Linked_List 와 Linked_List_Iterator 클래스는 상호간에 자유로운 멤버 접근을 허용하기 위해서
+            각 클래스에 서로 상대 클래스를 friend 클래스로 선언되어 있다.
+
+            // file name : list.h
+            // header file for class declaration of Linked_List, Linked_List_Node, Linked_List_Iterator
+            // This file is just for int data type
+
+            class Linked_List_Node {
+                friend class Linked_List_Iterator;
+                friend class Linked_List;
+                private:
+                    int data;
+                    ~Linked_List_Node() { cout << "Linked_List_Node destructor: " << data << endl; }
+                    Linked_List_Node * prev;
+                    Linked_List_Node * next;
+                    Linked_List_Node(int d);
+                    Linked_List_Node(const & Linked_List_Node) {} // copy constructor
+                    Linked_List_Node & operator=(const & Linked_List_Node) {} // assignment operator
+            };
+            
+            class Linked_List_Iterator; // forward declaration
+            class Linked_List {
+                public:
+                    Linked_List();
+                    Linked_List(const Linked_List & source);
+                    Linked_List & operator=(const Linked_List & source);
+                    ~Linked_List();
+                    void add_at_front(int & new_datum);
+                    void add_at_front(int & new_datum, Linked_List_Iterator & iter);
+                    void add_at_back(int &new_datum);
+                    void add_at_back(int & new_datum, Linked_List_Iterator & iter);
+                    int get_List_length();
+                friend class Linked_List_Iterator;
+                private:
+                    int item_num;
+                    Linked_List_Node * head;
+                    Linked_List_Node * tail;
+                    void remove_all_items();
+            };
+
+            class Linked_List_Iterator {
+                public:
+                    Linked_List_Iterator(Linked_List & list);
+                    void advance();
+                    bool at_end();
+                    void remove_at_iterator();
+                    void insert_before_iterator(int & new_datum);
+                    int access_at_iterator();
+                    void reset_from_list(Linked_List & list);
+                    void invalidate();
+                friend class Linked_List;
+                private:
+                    Linked_List_Node * current;
+                    Linked_List * list_p;
+                    // prohibit default constructor, copy constructor, assignment
+                    Linked_List_Iterator(Linked_List_Iterator & iter) {}
+                    Linked_List_Iterator & operator=(Linked_List_Iterator & iter) {}
+            };
+
+            다음은 정수형 양방향 연결 리스트를 테스트 하기 위한 대화형 프로그램이다.
+            파일 머리에 앞서 작성한 헤더 파일을 포함하는 include 문이 있다.
+            find_del은 특정 값을 가진 모든 노드들을 리스트에서 삭제하는 함수이고,
+            display_list는 리스트 내의 모든 노드들의 값을 차례로 출력하는 함수이다.
+
+            #include <iostream>
+            #include "list.h"
+
+            // Test Program for Linked_List
+            // Find every nodes with given value and delete them all
+
+            void find_del(int v, Linked_List & list) {
+                Linked_List_Iterator(list);
+                while(iter.at_end() == false) {
+                    if(iter.access_at_iterator() == v) {
+                        iter.remove_at_iterator();
+                        cout << "I got it" << endl;
+                    } else {
+                        iter.advance();
+                    }
+                }
+            }
+
+            // print out all the nodes in the list
+
+            void display_list(Linked_List & list) {
+                Linked_List_Iterator iter(list);
+                while(!iter.at_end()) {
+                    cout.width(3);
+                    cout << iter.access_at_iterator();
+                    iter.advance();
+                }
+                cout << endl;
+            }
+
+            // Test main function
+            void main() {
+                Linked_List ll; // list
+                Linked_List_Iterator my_iter(ll); // Iterator
+
+                int v = 1; // input value
+                bool done = false; // program exit flag
+                char cmd; // command
+
+                while(done == false) {
+                    cin >> cmd; // get command
+                    switch(cmd) {
+                        case 'i': 
+                            cin >> v;
+                            ll.add_at_front(v.my_iter);
+                            break;
+                        case 'a':
+                            ll.add_at_back(v.my_iter);
+                            break;
+                        case 's':
+                            cin >> v;
+                            cout << "Remove by value" << endl;
+                            find_del(v.ll);
+                            my_iter.reset_from_list(ll);
+                            break;
+                        case 'n':
+                            my_iter.advance();
+                            cout << "Advance Current Point to "
+                                << my_iter.access_at_iterator() << endl;
+                            break;
+                        case 'b':
+                            cin >> v;
+                            my_iter.insert_before_iterator(v);
+                            break;
+                        case 'r':
+                            cout << "Remove Current iter" << endl;
+                            my_iter.remove_at_iterator();
+                            break;
+                        case 'q':
+                            cout << "Exit" << endl;
+                            done = true;
+                            break;
+                        default:
+                            cout << "Wrong command" << endl;
+                            break;
+                    }
+                    display_list(ll);
+                    cout << "Current = " << my_iter.access_at_iterator() << endl;
+                }
+            }
+
+            위의 정수형 구현 코드를 참조로 하여 template을 이용한 양방향 연결 리스트 클래스를 완성하라.
+
+    4.4 단계 2 : Person 객체에 이름 추가
+
+        4.4.1 name 멤버 추가
+
+            Person 클래스의 객체가 이름을 가지도록 문자열을 가리키는 char * 형의 멤버를 추가한다.
+            new 명령을 이용해서 새로운 Person 객체를 만들 때 "Jack" 등의 한 단어로 된 이름을
+            받아들이도록 변경하라. 단, 이름의 길이는 128문자를 넘지 않는다고 제한한다.
+            이로써, 이름을 저장하기 위한 임시 버퍼의 충분한 크기를 안전하게 정할 수 있다.
+            객체에 이름이 추가됨으로써, display_status, restore, save 등의 함수들도 변경되어야 한다.
+            display_status 함수도 클래스의 계층적 구조의 이점을 충분히 살리도록 수정한다.
+            즉, 각 클래스마다 개별적인 display_status 함수를 가져서 
+            그 클래스의 고유한 멤버 값을 각각 담당하여 출력하도록 한다.
+            아울러, 출력 문자의 포맷도 세련되게 바꾸어 보라.
+
+        4.4.2 소멸자 추가
+
+            각 Person 클래스에 소멸자를 추가한다.
+            소멸자가 적절히 호출되는지 보기 위해서 "Soldier Jack is deallocated" 식의 메시지를 출력한다.
+            이름 문자열을 위한 기억장소도 시스템에 반환되어야 한다.
+            (주의) Person 객체의 포인터를 통해서 읽어낸 Soldier, Peasant, Warrior 등의 객체가 소멸될 때는,
+            계층별로 소멸자가 차례로 호출되게 하기 위해서는 모든 클래스의 소멸자가 가상 함수로 선언되어야 한다.
+
+        4.4.3 Person류 객체의 복사 금지
+
+            게임에서는 Person 류의 객체는 각각이 고유하기 때문에 복사본이 존재해서는 안된다.
+            프로그래머의 실수로 복사본이 생기는 것을 예방하기 위해서 
+            Person 클래스 복사 생성자와 치환연산자를 외부에서 사용할 수 없도록
+            이들을 private으로 선언해야 한다.
+            한편, Person 클래스의 인자가 전혀 없는 기본 생성자도 의미가 없으므로 사용할 수 없도록 private으로 선언한다.
+
+    4.5 단계 3 : 양방향 연결 리스트를 이용한 Person 객체 관리
+
+        4.5.1 개요
+
+            이번 단계에서는 게임에 추가할 수 있는 Person 객체의 갯수에 대한 제한을 없애는 것이다.
+            단계 1에서 만든 Linked_List 클래스를 사용하여 동적 연결 리스트로 배열을 대신하게 한다.
+            기본적으로는 Game_World 클래스에 있는 Person * 의 일차원 배열 대신에 Linked_List<Person *> 를
+            Game_World의 멤버로 사용하여 Person 객체의 포인터를 연결 리스트로 관리하게 하는 것이다.
+            리스트 내에서는 Person들의 이름 순으로 항상 정렬시켜서 리스트를 유지한다.
+            Game_World를 저장할 때 현재시간까지 저장하도록 save와 restore를 변경해야 한다.
+
+        4.5.2 main 모듈을 위한 Game_World의 멤버 함수 추가/수정
+
+            update_all_object() 함수와 generate_display() 함수의 추가
+                추가되는 이 Game_World의 멤버 함수들은 main 모듈에서 Game_Word 클래스 내부 구조를 모르고도 
+                go 명령을 수행할 수 있도록 한다.
+                이들의 기능은 main 모듈에서 하던 Game_Word 내의 모든 Person 객체들에 대한 정보를 
+                update 동작과 Board_View에 plot 하는 동작을 담당하는 것이다.
+                이 새로운 함수들을 단지 호출함으로써 main 모듈은 이전에 하던 동일한 작업을 수행할 수 있게 된다.
+
+                get_object_ptr() 함수의 수정
+                    Game_Word 클래스의 get_object_ptr() 함수는 주어진 ID 번호를 가진 Person 객체를 
+                    리스트의 검색을 통해서 찾아내어 그 포인터를 반환한다.
+                    만약에 주어진 ID를 가진 객체가 리스트에 존재하지 않는다면 0을 반환한다.
+                    이 함수는 제한적으로만 사용되어야 한다.
+                    get_object_ptr() 함수의 사용이 허용되는 유일한 상황은 attack 명령의 수행 등을 위해서 
+                    하나의 Person 객체가 ID 번호로만 지정되어서 있을 경우이다.
+                    이 함수는 프로젝트 #3에서 사용되던 방식으로 Game_Word의 모든 객체들을 차례로 방문하기 위해서
+                    (ID 번호를 0부터 객체의 개수만큼까지 차례로 증가시키면서 get_object_ptr 함수를 호출하는 방식으로)
+                    사용되어서는 안된다.
+                    이제 ID 번호는 반드시 연속적이지 않을 수 있고, 삭제된 ID 번호는 다음에 생성되는 객체에 재사용 될 수도 있다.
+
+                get_new_ID() 함수의 추가
+                    Game_Word에 새로운 객체를 위한 ID 번호를 찾아주는 get_new_ID() 함수를 추가한다.
+                    get_new_ID 함수는 새로운 객체를 만들 때 사용 가능한 가장 작은 ID 번호를 찾아서 반환한다.
+                    "new" 명령어는 새 객체에 ID 번호를 할당하기 이해서 이 함수를 사용해야 한다.
+
+                새로운 명령어 'd'를 추가한다. 이 명령은 모든 객체에 대해서 display_status()를 실행시켜서 객체들의 정보를 출력한다.
+                각 객체들은 이름의 알파벳 순으로 정렬되어 출력되어야 한다.
+                따라서, Person 객체들은 리스트에 저장될 때부터 알파벳 순으로 유지되도록 해야 한다.
+
+            4.5.3 dead 상태의 Person 객체 처리
+
+                update를 실시하는 동안 어떤 Person 객체가 dead 상태임이 발견되면 그 객체의 리스트로부터 제거되고
+                그 기억장소는 시스템에 반환되어야 한다.
+                또한, 제거된 죽은 객체의 ID 번호는 새로운 객체를 위해서 재사용된다.
+                주의할 사항은, 죽은 객체의 ID를 사용하는 연산이 일어나지 않도록 해야 한다.
+                예컨대, attack 동작을 수행할 때 공격대상 객체가 더 이상 존재하지 않는다면 
+                공격을 멈추고 is_attacking을 false로 두어야 한다.
+
+            4.5.4 Game_Word 내의 Person 객체 스캔을 위한 인터페이스 encapsulation
+
+                start_scan() 함수와 get_next_scan_ptr() 함수의 추가
+                    Archer 객체에서는 update 함수 실행시에 자신과 가장 가까운 거리에 있는 공격 목표물을 찾기 위해서
+                    Game_Word의 리스트에 속한 모든 객체들을 차례대로 하나씩 불러낼 필요가 있다.
+                    이 경우, Game_Word 내의 구조를 알 필요 없이 이 일을 수행하도록 Game_Word에 새로운 멤버 함수를 추가한다.
+                    start_scan() 함수는 Game_Word 내의 새로운 private 멤버 변수 Linked_List_Iterator를 초기화하여 
+                    Game_Word 내의 Linked_List의 첫 노드부터 차례로 검색할 수 있도록 준비한다.
+                    get_next_scan_ptr() 함수는 Game_Word의 리스트의 다음번 노드의 포인터를 반환하되, 
+                    만약 리스트의 마지막 노드까지 검색이 끝났으면 0을 반환한다.
+                    이 함수들을 구현할 때, 한번에 하나의 순차 검색 동작만이 존재한다고 가정한다.
+                    이 새로운 멤버 변수 함수들은 Archer 객체 외의 다른 객체도 Game_Word의 내부를 모르고 이용할 수 있도록
+                    제공되어야 한다.
+
+            4.5.5 복사 생성자와 치환 연산자 중첩하기
+
+                복사 생성자와 할당 연산자의 중첩이 올바르게 작동하는지 시영하기 위해서 
+                Game_Word의 save() 함수의 처음에 다음과 같은 두 문장을 삽입한다.
+
+                    Linked_List<Person *> copy_list(obj_list); // copy constructor call
+                    obj_list = copy_list; // assignment operator overloading
+
+                이 복사 생성자와 치환 연산자 중첩의 실행 결과로 Person 류의 객체들의 destructor와
+                Linked_List_Node 클래스 객체의 destructor로부터의 메시지가 출력되어야 하고,
+                save() 함수의 실행 결과가 성공적이어야 할 것이다.
+
+    4.6 단계 4 : 에러 처리를 위한 exception 사용하기
+
+        단순한 exception 객체 클래스로서 bad_input 이란 클래스를 정의하라.
+        이 객체는 문자열 포인터를 멤버로 포함한다.
+        사용자의 명령 입력 중에 오류를 검색하는 모든 부분에서 오류 입력이 판단되면 exception 객체의 throw를 실행시킨다.
+        오류 검색 부분은 단순한 if ( ... ) throw bad_input("Error ... "); 문으로 구현하라.
+        catch 문은 main 함수에 둔다. 오류가 어디선가 발생하여 throw가 실행되면 catch 부분은 exception 객체에 있는 오류 문자열을 출력하고
+        (flush 함수로 완전히 버퍼를 비우고), 다음번 명령어를 기다리는 프롬프트를 사용자에게 내보낸다.
+        이로써 매우 간결하고도 단순한 에러 처리 기능이 구현되어야 한다.
+        
+    4.7 단계 5 : 새로운 클래스 추가하기
+
+        마지막으로 Observer 클래스를 추가한다.
+        이 클래스는 Person 클래스의 파생클래스이다. 이 클래스는 주어진 목적지 좌표를 차례로 따라서 이동하면서 
+        자기로부터 반경 10 이내에 있는 객체들에 대해서 다음과 같은 식의 메시지를 출력함으로써 보고한다.
+
+            "I see P1("Joe") at location (10,5)"
+        
+        이동할 목적지는 move 명령을 통해서 입력받게 되며 여러 개의 목적지를 언제든지 입력 받을 수 있다.
+        입력받은 목적지 좌표는 내부의 Linked_List<Real_Pair> 멤버에 저장한다.
+        만약에 주어진 목적지들을 다 방문하였으면, 대기 모드에 들어가서 다음번 목적지가 입력될 때 까지 다른 객체가 가까이 접근하더라고
+        전혀 동작하지 않고 가만히 있는다.
+        Observer 객체를 생성하기 위한 new 명령어 옵션이 추가되어야 하며 ('O' 문자를 사용), 소멸자는 반드시 Linked_List의 기억장소를 반환하도록 한다.
+        또한, 복사 생성자와 치환 연산자 중첩은 private으로 하여 실수로 이 객체를 복사하지 못하도록 한다.
+        그 외의 동작들은 Person 클래스의 속성을 그대로 이어받는다.
+
+        
+
