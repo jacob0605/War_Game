@@ -3,3 +3,5 @@
 *.svd
 *.log
 *backup.txt
+/.vscode
+/build
