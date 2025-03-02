@@ -1,7 +1,7 @@
 ---
-name: "[FEAT] 이슈 제목"
+name: FEAT
 about: Request a new feature
-title: ''
+title: "[Feat] 이슈 제목"
 labels: ''
 assignees: ''
 
