@@ -1,0 +1,10 @@
+^C:\GIT\WAR_GAME\BUILD\CMAKEFILES\E10B82456943ADBFE1FCC87A07A44E59\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Git/War_Game -BC:/Git/War_Game/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Git/War_Game/build/test_make.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

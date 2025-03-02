@@ -1,0 +1,8 @@
+C:/Git/War_Game/build/CMakeFiles/test_make.dir
+C:/Git/War_Game/build/CMakeFiles/Experimental.dir
+C:/Git/War_Game/build/CMakeFiles/Nightly.dir
+C:/Git/War_Game/build/CMakeFiles/Continuous.dir
+C:/Git/War_Game/build/CMakeFiles/NightlyMemoryCheck.dir
+C:/Git/War_Game/build/CMakeFiles/RUN_TESTS.dir
+C:/Git/War_Game/build/CMakeFiles/ALL_BUILD.dir
+C:/Git/War_Game/build/CMakeFiles/ZERO_CHECK.dir
