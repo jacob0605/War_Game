@@ -19,7 +19,7 @@ public:
     Archer();
     Archer(int id, double x, double y);
     Archer(Game_World * w_ptr); // 기본 생성자의 기능 + w_ptr 인자를 받아서 world_pointer 값 초기화 수행
-    Archer(Game_World * w_ptr, int id, double x, double y); // 기본 생성자의 기능 + world_pointer 값 초기화 + Person 객체의 ID와 location 초기화 수행
+    Archer(Game_World * w_ptr, int id, double x, double y, const std::string& _name); // 기본 생성자의 기능 + world_pointer 값 초기화 + Person 객체의 ID와 location 초기화 수행
     virtual void update(); // 객체의 상태를 갱신한다. 자세한 내용은 다음의 [객체 이동 방법]에서 설명한다.  
     virtual void display_status();
     virtual void save(std::ofstream & outfile); 

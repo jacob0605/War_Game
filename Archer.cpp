@@ -40,7 +40,7 @@ Archer::Archer(Game_World * w_ptr) : Warrior(w_ptr) {
 }
 
 // Person(Game_World * w_ptr, char c, int id, double in_x, double in_y);
-Archer::Archer(Game_World * w_ptr, int id, double x, double y) : Warrior(w_ptr, 'A', id, x, y) {
+Archer::Archer(Game_World * w_ptr, int id, double x, double y, const string& _name) : Warrior(w_ptr, 'A', id, x, y, _name) {
     // 기본 생성자의 기능 + world_pointer 값 초기화 + Person 객체의 ID와 location 초기화 수행
     // id_num = id;
     // location.x = x;

@@ -16,22 +16,34 @@ Person::Person() : world_ptr(nullptr), code('?'), id_num(0), speed(5), health(5)
     // code = '?';
     // world_ptr = nullptr;
     // cout<<"Person Default Constructor called"<<endl;
+    name = "defaultName";
 }
 
-Person::Person(Game_World * w_ptr) : world_ptr(w_ptr), code('?'), id_num(0), speed(5), health(5), is_moving(false) {
+/**
+ * Person class constructor
+ * @param w_ptr world pointer
+ */
+Person::Person(Game_World * w_ptr) : 
+                world_ptr(w_ptr), 
+                // name(_name),
+                code('?'), 
+                id_num(0), 
+                speed(5), 
+                health(5), 
+                is_moving(false) { // not moving 현재 상태, 정지중임
     // // 기본 생성자의 기능 + w_ptr 인자를 받아서 world_pointer 값 초기화 수행
     // id_num = 0; // ID = 0
     // speed = 5; // speed = 5 units/tick
     // // location, destination, delta; // location, destination, delta 멤버들은 모두 Real_Pair 객체임
     //     // Real_Pair 디폴트 생성자에 의해 (0,0)으로 자동으로 초기화
     // health = 5; // health = 5
-    // is_moving = false; // not moving 현재 상태, 정지중임
+    // is_moving = false; 
     // code = '?';
     // world_ptr = w_ptr;
     // cout<<"Person Second Constructor called"<<endl;
 }
 
-Person::Person(Game_World * w_ptr, char c, int id, double in_x, double in_y) : world_ptr(w_ptr), code(c), id_num(id), location(in_x, in_y), speed(5), health(5), is_moving(false) {
+Person::Person(Game_World * w_ptr, char c, int id, double in_x, double in_y, const string& _name) : world_ptr(w_ptr), name(_name), code(c), id_num(id), location(in_x, in_y), speed(5), health(5), is_moving(false) {
     // // 기본 생성자의 기능 + world_pointer 값 초기화 + Person 객체의 ID와 location 초기화 수행
     // id_num = id; // ID = 0
     // speed = 5; // speed = 5 units/tick
@@ -104,6 +116,10 @@ void Person::set_load(double in_load) {
     cout<< "I can't carry a load" << endl;
 }
 
+void Person::display_status() {
+    cout << "Name : " << name << endl;
+}
+
 void Person::save(ofstream & outfile) {
 /*
 이 함수는 모든 멤버 변수들의 값을 제공된 파일에 기록함. 클래스의 타입을 표시하는 code 문자를 가장 먼저 기록한다.
@@ -139,6 +155,7 @@ world_ptr 값은 파일에 기록하지 않는다.
     outfile << destination << endl; // 객체가 이동할 경우 최종 목적지의 위치 좌표
     outfile << health << endl; // 이 값이 0이 되면 그 객체는 "죽게 된다"
     outfile << is_moving << endl; // 객체가 현재 이동중인지 정지 상태인지를 표시함. 이 값이 true 이면 이동중임
+    outfile << name << endl; // 객체의 이름, string 타입의 변수
 
     // 파일 닫기 -> 여기서 진행하지 않는다.
 
@@ -175,6 +192,7 @@ world_ptr의 값도 읽어들이지 않는다. (기본값은 0이다.)
     infile >> destination;
     infile >> health;
     infile >> is_moving;
+    infile >> name;
 
 }
 

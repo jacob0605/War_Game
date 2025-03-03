@@ -53,7 +53,7 @@ Peasant::Peasant(Game_World * w_ptr) : Person(w_ptr) {
     initialize();
 }
 
-Peasant::Peasant(Game_World * w_ptr, int id, double x, double y) : Person(w_ptr, 'P', id, x, y) {
+Peasant::Peasant(Game_World * w_ptr, int id, double x, double y, const string& _name) : Person(w_ptr, 'P', id, x, y, _name) {
     // id_num = id;
     // location.x = x;
     // location.y = y;

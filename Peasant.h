@@ -17,7 +17,7 @@ public:
     Peasant();
     Peasant(int id, double x, double y); // 객체의 ID를 id로 설정, 초기위치를 (x,y)로 설정. 나머지 정보는 private 초기화 함수를 이용 
     Peasant(Game_World * w_ptr);
-    Peasant(Game_World * w_ptr, int id, double x, double y);
+    Peasant(Game_World * w_ptr, int id, double x, double y, const std::string& _name);
     virtual void update(); // 객체의 상태를 매 time step 마다 갱신
     virtual void set_load(double in_load);
     virtual void display_status();

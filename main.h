@@ -28,7 +28,7 @@ void go_command(std::ofstream & log_file, int& time, Game_World & G1);
 // r : resize
 // n : new
 void add_command(std::ofstream & log_file, Game_World & G1);
-void dynamic_memory_allocate(std::ofstream & log_file, Game_World & G1, char type, double x = 0, double y = 0);
+void dynamic_memory_allocate(std::ofstream & log_file, Game_World & G1, const std::string& _name, char type, double x = 0, double y = 0);
 // v : save
 void save_data(std::ofstream & log_file, Game_World & G1);
 // l : load

@@ -381,7 +381,7 @@ void go_command(ofstream & log_file, int & time, Game_World & G1) {
     }
 }
 
-void dynamic_memory_allocate(ofstream & log_file, Game_World & G1, char type, double x, double y) {
+void dynamic_memory_allocate(ofstream & log_file, Game_World & G1, const string& _name, char type, double x, double y) {
     
     // add_command 함수에서 메모리 동적 할당 부분만 여기로 옮길 예정
     // 함수의 타입을 void로 해서 하는게 좋을까 아니면 Person * 타입으로 해서 리턴값을 가지게 하는 게 좋을까.
@@ -398,7 +398,7 @@ void dynamic_memory_allocate(ofstream & log_file, Game_World & G1, char type, do
 
     switch(type) {
         case 'P': 
-            ptr = new Peasant(&G1, id, x, y); 
+            ptr = new Peasant(&G1, id, x, y, _name); 
             if(ptr==nullptr) {
                 cerr<<"Failed to allocate memory in Line " << __LINE__ << " of " << __FILE__ << endl;
                 //exit(-1);
@@ -409,7 +409,7 @@ void dynamic_memory_allocate(ofstream & log_file, Game_World & G1, char type, do
             log_file<< "Make new character, type: " << type << " at " << x << ", " << y << endl;
             break; // Peasant 객체 생성
         case 'S': 
-            ptr = new Soldier(&G1, id, x, y); 
+            ptr = new Soldier(&G1, id, x, y, _name); 
             if(ptr==nullptr) {
                 cerr<<"Failed to allocate memory in Line " << __LINE__ << " of " << __FILE__ << endl;
                 // exit(-1);
@@ -420,7 +420,7 @@ void dynamic_memory_allocate(ofstream & log_file, Game_World & G1, char type, do
             log_file<< "Make new character, type: " << type << " at " << x << ", " << y << endl;
             break; // Soldier 객체 생성
         case 'A': 
-            ptr = new Archer(&G1, id, x, y); 
+            ptr = new Archer(&G1, id, x, y, _name); 
             if(ptr==nullptr) {
                 cerr<<"Failed to allocate memory in Line " << __LINE__ << " of " << __FILE__ << endl;
                 // exit(-1);
@@ -459,13 +459,14 @@ void add_command(ofstream & log_file, Game_World & G1) {
     char type;
     double x;
     double y;
+    string name;
 
     // cout<< "Enter type('P' or 'S' or 'A') x y" << endl;
-    cin >> type >> x >> y;
+    cin >> type >> x >> y >> name;
     type = toupper(type); // 타입을 소문자로 입력할 경우를 대비, 대문자로 전환
-    cout<< "type : " << type << ", x = " << x << ", y = " << y << endl; // 확인용 코드
+    cout<< "type : " << type << ", x = " << x << ", y = " << y << ", name: " << name << endl; // 확인용 코드
 
-    dynamic_memory_allocate(log_file, G1, type, x, y);
+    dynamic_memory_allocate(log_file, G1, name, type, x, y);
     
 }
 

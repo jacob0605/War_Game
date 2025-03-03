@@ -12,6 +12,7 @@ class Game_World;
 class Person {
 private:
     Real_Pair delta; // 객체가 이동중에 있을 때, 그 객체의 매 시뮬레이션 시간별 x와 y 좌표 변화량
+    std::string name;
 protected:
     int id_num; // 객체를 유일하게 나타내는 식별자
     double speed; // 객체가 매 시각마다 이동하는 속도
@@ -25,7 +26,7 @@ protected:
 public:
     Person(); // default constructor
     Person(Game_World * w_ptr); // 기본 생성자의 기능 + w_ptr 인자를 받아서 world_pointer 값 초기화 수행
-    Person(Game_World * w_ptr, char c, int id, double in_x, double in_y); // 기본 생성자의 기능 + world_pointer 값 초기화 + Person 객체의 ID와 location 초기화 수행
+    Person(Game_World * w_ptr, char c, int id, double in_x, double in_y, const std::string& _name); // 기본 생성자의 기능 + world_pointer 값 초기화 + Person 객체의 ID와 location 초기화 수행
     virtual ~Person() {}; // 정상적인 메모리 반납을 위해 베이스 클래스의 소멸자를 가상함수로 선언
     virtual void move_command(Real_Pair destination); // 객체를 주어진 좌표 destination으로 움직이도록 시동을 건다.  
     int get_ID() { return id_num; } // 객체의 ID 번호를 돌려준다.
@@ -33,7 +34,7 @@ public:
     bool get_alive() { return health>0; } // 객체가 살아있는지 (alive 상태인지) health 값을 기준으로 하여 돌려준다. (true 값을 return하면 alive 상태임을 뜻한다.)
     virtual void update() = 0;
     virtual void set_load(double in_load);
-    virtual void display_status() = 0;
+    virtual void display_status();
     virtual void save(std::ofstream & outfile);
     virtual void restore(std::ifstream & infile);
     char get_code() { return code; };
@@ -44,6 +45,8 @@ public:
     void set_health(int hp) { health = hp; }
     int get_speed() { return health; }
     void set_speed(int s) { speed = s; }
+    std::string get_name() const { return name; }
+    void set_name(std::string& _name);
 };
 
 #include "Game_World.h"
