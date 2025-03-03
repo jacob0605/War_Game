@@ -20,7 +20,7 @@ public:
     Warrior();
     Warrior(int id, double x, double y);
     Warrior(Game_World * w_ptr); // 기본 생성자의 기능 + w_ptr 인자를 받아서 world_pointer 값 초기화 수행
-    Warrior(Game_World * w_ptr, char c, int id, double x, double y); // 기본 생성자의 기능 + world_pointer 값 초기화 + Person 객체의 ID와 location 초기화 수행
+    Warrior(Game_World * w_ptr, char c, int id, double x, double y, const std::string& _name); // 기본 생성자의 기능 + world_pointer 값 초기화 + Person 객체의 ID와 location 초기화 수행
     virtual ~Warrior();
     virtual void save(std::ofstream & outfile);
     virtual void restore(std::ifstream & infile);
