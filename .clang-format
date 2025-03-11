@@ -1,17 +1,59 @@
+# 언어 및 스타일 설정
 Language: Cpp
-BasedOnStyle: LLVM # Google 스타일을 기반으로 설정
-IndentWidth: 4 # 들여쓰기 크기 설정 (4 공백)
-TabWidth: 4 # 탭 크기 설정 (4 공백 크기만큼)
-UseTab: Always # 탭을 사용하여 들여쓰기
-ColumnLimit: 0 # 한 줄 최대 길이를 120자로 설정
+
+# `#include` 정렬 및 헤더 관련 설정
+SortIncludes: false
+IncludeBlocks: Preserve
+
+# 코드 정렬 관련 설정
+AccessModifierOffset: -4
+AlignAfterOpenBracket: DontAlign
+AlignConsecutiveAssignments: false
+AlignOperands: DontAlign
+AlignTrailingComments: true
+BinPackArguments: false
+BinPackParameters: false
+
+# 들여쓰기 및 공백 설정
+IndentWidth: 4
+UseTab: Never
+TabWidth: 4
+IndentPPDirectives: None
+IndentCaseBlocks: false
+IndentCaseLabels: true
+SpaceBeforeCaseColon: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInAngles: false
+
+# 중괄호 스타일
+BreakBeforeBraces: Attach
 BraceWrapping:
-    AfterControlStatement: true # if, for, while 등의 제어문에서 중괄호를 옆에 배치
-    AfterFunction: false # 함수 선언 후 중괄호를 옆에 배치
-    AfterClass: true # 클래스 선언 후 중괄호를 옆에 배치
-    AfterEnum: true # 열거형 선언 후 중괄호를 옆에 배치
-    AfterStruct: true # 구조체 선언 후 중괄호를 옆에 배치
-    SplitEmptyFunction: false # 빈 함수에서 중괄호를 한 줄로 작성
-PointerAlignment: Left  # 포인터(*)와 참조(&)를 왼쪽에 배치 (예시: int32* temp;)
-AlignTrailingComments: true 
-# 접근 제어자 위치 설정
-AccessModifierOffset: -4  # public, private, protected 등을 클래스/구조체의 맨 앞에 배치하도록 설정
+  AfterClass: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterStruct: false
+  BeforeElse: false
+  IndentBraces: false
+
+# 짧은 함수 및 제어문 처리
+AllowShortFunctionsOnASingleLine: All  # 모든 짧은 함수는 한 줄 유지
+AllowShortIfStatementsOnASingleLine: Always  # 짧은 if문도 한 줄 유지
+AllowShortLoopsOnASingleLine: true  # 짧은 반복문도 한 줄 유지
+AllowShortCaseLabelsOnASingleLine: false  # switch-case 내부 코드 한 줄 유지 안 함
+
+# 생성자 초기화 리스트 설정 (이니셜라이저 리스트 줄바꿈 방지)
+BreakConstructorInitializers: BeforeColon
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+
+# 줄바꿈 스타일
+ColumnLimit: 0
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: true
+BreakStringLiterals: false
+
+# 포인터 및 참조 스타일
+PointerAlignment: Left
+Cpp11BracedListStyle: true

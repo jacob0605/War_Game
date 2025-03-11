@@ -14,31 +14,43 @@ template <typename T>
 class Linked_List_Node {
     friend class Linked_List<T>;
     friend class Linked_List_Iterator<T>;
+
 private:
     T data;
     Linked_List_Node* prev;
     Linked_List_Node* next;
     Linked_List_Node(T d) : data(d), prev(nullptr), next(nullptr) {}
     ~Linked_List_Node() { std::cout << "Node " << data << " deleted" << std::endl; }
+    Linked_List_Node(const& Linked_List_Node) = delete;            // copy constructor
+    Linked_List_Node& operator=(const& Linked_List_Node) = delete; // assignment operator
+
+    // public:
+    //     Linked_List_Node* get_prev() { return prev; }
+    //     void set_prev(Linked_List_Node* _prev) { prev = _prev; }
+    //     Linked_List_Node* get_next() { return next; }
+    //     void set_prev(Linked_List_Node* _next) { next = _next; }
 };
 
 // 링크드 리스트 클래스
 template <typename T>
 class Linked_List {
     friend class Linked_List_Iterator<T>;
+
 private:
     int item_num;
     Linked_List_Node<T>* head;
     Linked_List_Node<T>* tail;
     void remove_all_items();
+
 public:
     Linked_List() : item_num(0), head(nullptr), tail(nullptr) {}
     ~Linked_List() { remove_all_items(); }
     void add_at_front(T new_datum);
-    void add_at_front(T new_datum, Linked_List_Iterator<T> & iter);
+    void add_at_front(T new_datum, Linked_List_Iterator<T>& iter);
     void add_at_back(T new_datum);
-    void add_at_back(T new_datum, Linked_List_Iterator<T> & iter);
+    void add_at_back(T new_datum, Linked_List_Iterator<T>& iter);
     int get_list_length() const { return item_num; }
+    void clear() { remove_all_items(); }
 };
 
 template <typename T>
@@ -55,7 +67,7 @@ void Linked_List<T>::add_at_front(T new_datum) {
 }
 
 template <typename T>
-void Linked_List<T>::add_at_front(T new_datum, Linked_List_Iterator<T> & iter) {
+void Linked_List<T>::add_at_front(T new_datum, Linked_List_Iterator<T>& iter) {
     add_at_front(new_datum);
     iter.current = head;
 }
@@ -74,7 +86,7 @@ void Linked_List<T>::add_at_back(T new_datum) {
 }
 
 template <typename T>
-void Linked_List<T>::add_at_back(T new_datum, Linked_List_Iterator<T> & iter) {
+void Linked_List<T>::add_at_back(T new_datum, Linked_List_Iterator<T>& iter) {
     add_at_back(new_datum);
     iter.current = tail;
 }
@@ -96,25 +108,49 @@ class Linked_List_Iterator {
 private:
     Linked_List_Node<T>* current;
     Linked_List<T>* list_p;
+
 public:
+    Linked_List_Iterator() : list_p(nullptr), current(nullptr) {}
     Linked_List_Iterator(Linked_List<T>& list) : list_p(&list), current(list.head) {}
-    void advance() { if (current) current = current->next; }
+    void advance() {
+        if (current) current = current->next;
+    }
     bool at_end() const { return current == nullptr; }
-    T access_at_iterator() const { return current ? current->data : T(); }
+    T access_at_iterator();
     void remove_at_iterator();
     void insert_before_iterator(T new_datum);
-    void reset_from_list(Linked_List<T> & list);
+    void reset_from_list(Linked_List<T>& list);
     void invalidate();
+    // void set_current(Linked_List_Node<T>* _current) { current = _current; }
+    // void push_back(T new_datum);
 };
+
+/**
+ * @return current ? &(current->data) : nullptr
+ */
+template <typename T>
+inline T Linked_List_Iterator<T>::access_at_iterator() {
+    return current ? current->data : nullptr;
+}
 
 template <typename T>
 void Linked_List_Iterator<T>::remove_at_iterator() {
-    if (!current) return;
+    if (!current) {
+        return;
+    }
     Linked_List_Node<T>* to_delete = current;
-    if (current->prev) current->prev->next = current->next;
-    if (current->next) current->next->prev = current->prev;
-    if (list_p->head == current) list_p->head = current->next;
-    if (list_p->tail == current) list_p->tail = current->prev;
+    if (current->prev) {
+        current->prev->next = current->next;
+    }
+    if (current->next) {
+        current->next->prev = current->prev;
+    }
+    if (list_p->head == current) {
+        list_p->head = current->next;
+    }
+    if (list_p->tail == current) {
+        list_p->tail = current->prev;
+    }
     current = current->next;
     delete to_delete;
     list_p->item_num--;
@@ -134,7 +170,7 @@ void Linked_List_Iterator<T>::insert_before_iterator(T new_datum) {
 }
 
 template <typename T>
-void Linked_List_Iterator<T>::reset_from_list(Linked_List<T> & list) {
+void Linked_List_Iterator<T>::reset_from_list(Linked_List<T>& list) {
     list_p = &list;
     current = list.head;
 }
@@ -144,5 +180,13 @@ void Linked_List_Iterator<T>::invalidate() {
     list_p = nullptr;
     current = nullptr;
 }
+
+// template <typename T>
+// inline void Linked_List_Iterator<T>::push_back(T new_datum) {
+//     if (!current) return;
+//     Linked_List_Node<T>* new_node = new Linked_List_Node<T>(new_datum);
+//     new_node->prev = current;
+//     new_node->next = nullptr;
+// }
 
 #endif // LINKED_LIST_H
