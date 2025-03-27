@@ -7,32 +7,17 @@ assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Description
+- 발생한 버그에 대한 간단한 설명
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## Steps to Reproduce
+1. 버그를 재현하는 단계 (예: 특정 버튼을 누르면 오류 발생)
+2. 관련 로그나 오류 메시지 (있다면 추가)
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Expected Behavior
+- 정상적으로 동작해야 하는 방식
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Tasks
+- [ ] 작업 할 내용
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+## Additional Context (Optional)
