@@ -2,5 +2,18 @@
 	"files.associations": {
 		"xstring": "cpp",
 		"iosfwd": "cpp"
-	}
+	},
+	"C_Cpp.formatting": "clangFormat",
+	"C_Cpp.clang_format_fallbackStyle": "None",
+	// "C_Cpp.clang_format_fallbackStyle": "Google",
+	"[cpp]": {
+		"editor.formatOnSave": true,
+		// "editor.formatOnSave": false,
+		"editor.defaultFormatter": "xaver.clang-format"  // clang-format을 기본 포맷터로 지정
+	},
+	"[c]": {
+		// "editor.formatOnSave": true,
+		"editor.formatOnSave": false,
+		"editor.defaultFormatter": "xaver.clang-format"  // clang-format을 기본 포맷터로 지정
+	},
 }
