@@ -5,63 +5,32 @@
 
 using namespace std;
 
-Person::Person() : world_ptr(nullptr), code('?'), id_num(0), speed(5), health(5), is_moving(false) {
-    // // 기본 생성자
-    // id_num = 0; // ID = 0
-    // speed = 5; // speed = 5 units/tick
-    // // location, destination, delta; // location, destination, delta 멤버들은 모두 Real_Pair 객체임
-    //     // Real_Pair 디폴트 생성자에 의해 (0,0)으로 자동으로 초기화
-    // health = 5; // health = 5
-    // is_moving = false; // not moving 현재 상태, 정지중임
-    // code = '?';
-    // world_ptr = nullptr;
-    // cout<<"Person Default Constructor called"<<endl;
-    name = "defaultName";
-}
-
 /**
  * Person class constructor
  * @param w_ptr world pointer
  */
-Person::Person(Game_World* w_ptr) : world_ptr(w_ptr),
-                                    // name(_name),
-                                    code('?'),
-                                    id_num(0),
-                                    speed(5),
-                                    health(5),
-                                    is_moving(false) { // not moving 현재 상태, 정지중임
-    // // 기본 생성자의 기능 + w_ptr 인자를 받아서 world_pointer 값 초기화 수행
-    // id_num = 0; // ID = 0
-    // speed = 5; // speed = 5 units/tick
-    // // location, destination, delta; // location, destination, delta 멤버들은 모두 Real_Pair 객체임
-    //     // Real_Pair 디폴트 생성자에 의해 (0,0)으로 자동으로 초기화
-    // health = 5; // health = 5
-    // is_moving = false;
-    // code = '?';
-    // world_ptr = w_ptr;
-    // cout<<"Person Second Constructor called"<<endl;
+Person::Person(Game_World* w_ptr) {
+    baseData.world_ptr = w_ptr;
 }
 
-Person::Person(Game_World* w_ptr, char c, int id, double in_x, double in_y, const string& _name) : world_ptr(w_ptr), name(_name), code(c), id_num(id), location(in_x, in_y), speed(5), health(5), is_moving(false) {
-    // // 기본 생성자의 기능 + world_pointer 값 초기화 + Person 객체의 ID와 location 초기화 수행
-    // id_num = id; // ID = 0
-    // speed = 5; // speed = 5 units/tick
-    // // location, destination, delta; // location, destination, delta 멤버들은 모두 Real_Pair 객체임
-    //     // Real_Pair 디폴트 생성자에 의해 (0,0)으로 자동으로 초기화
-    // health = 5; // health = 5
-    // is_moving = false; // not moving 현재 상태, 정지중임
-    // code = c;
-    // world_ptr = w_ptr;
-    // location.x = in_x;
-    // location.y = in_y;
-    // cout<<"Person Third Constructor called"<<endl;
+Person::Person(Game_World* w_ptr, char c, int id, double in_x, double in_y, const string& _name) {
+    baseData.code = c;
+    baseData.id_num = id;
+    baseData.name = _name;
+    // baseData.health;
+    // baseData.speed;
+    // baseData.is_moving;
+    baseData.location = Real_Pair(in_x, in_y);
+    baseData.destination;
+    baseData.delta;
+    baseData.world_ptr = w_ptr;
 }
 
 void Person::update_location() {
-    if (is_moving == true) {                                                                                          // 객체가 이동중이라면 == is_moving의 값이 true임
-        if ((abs(destination.x - location.x) <= abs(delta.x)) && (abs(destination.y - location.y) <= abs(delta.y))) { // 곧 도착
-            location = destination;
-            cout << "ID: " << id_num << ", arrived" << endl;
+    if (baseData.is_moving == true) {                                                                                                                                       // 객체가 이동중이라면 == is_moving의 값이 true임
+        if ((abs(baseData.destination.x - baseData.location.x) <= abs(baseData.delta.x)) && (abs(baseData.destination.y - baseData.location.y) <= abs(baseData.delta.y))) { // 곧 도착
+            baseData.location = baseData.destination;
+            cout << "ID: " << baseData.id_num << ", arrived" << endl;
             /*
             공격할 수 있는 객체가 이동 중 적을 공격하고
             목표가 죽은 경우 다시 원래의 목적지로 이동하게 만들 예정이다.
@@ -76,19 +45,19 @@ void Person::update_location() {
             하지만, 이미 도착해 있는 상태에서 다시 도착 메시지를 출력하지 않게 하기 위해
             delta의 값을 (0,0)으로 변경한다.
             */
-            delta.x = 0;
-            delta.y = 0;
-            is_moving = false;
+            baseData.delta.x = 0;
+            baseData.delta.y = 0;
+            baseData.is_moving = false;
         } else { // 이동중
-            location = location + delta;
-            cout << "ID: " << id_num << ", moving" << endl;
+            baseData.location = baseData.location + baseData.delta;
+            cout << "ID: " << baseData.id_num << ", moving" << endl;
         }
     }
 }
 
 void Person::move_command(Real_Pair destination) {
-    if (health <= 0) {
-        cout << "I'm dead - can't move (id: " << id_num << ")" << endl;
+    if (baseData.health <= 0) {
+        cout << "I'm dead - can't move (id: " << baseData.id_num << ")" << endl;
     } else {
         /*
         목적지 좌표를 destination 멤버 변수에 저장
@@ -104,9 +73,9 @@ void Person::move_command(Real_Pair destination) {
         // 목적지 좌표를 destination 멤버 변수에 저장하는 코드 작성할것 -> 작성 하였음. 아래에서 서술함.
         // 함수 인자로 목표 좌표를 저장하고 있는 Real_Pair 클래스를 받아서
         // Person 클래스의 멤버 변수인 destination에 저장
-        this->destination = destination;
-        is_moving = true;
-        delta = (destination - location) * (speed / distance(destination, location));
+        this->baseData.destination = destination;
+        baseData.is_moving = true;
+        baseData.delta = (baseData.destination - baseData.location) * (baseData.speed / distance(baseData.destination, baseData.location));
     }
 }
 
@@ -115,7 +84,7 @@ void Person::set_load(double in_load) {
 }
 
 void Person::display_status() {
-    cout << "Name : " << name << endl;
+    cout << "Name : " << baseData.name << endl;
 }
 
 void Person::save(ofstream& outfile) {
@@ -145,15 +114,21 @@ void Person::save(ofstream& outfile) {
         bool is_moving; // 객체가 현재 이동중인지 정지 상태인지를 표시함. 이 값이 true 이면 이동중임
         char code; // Person 객체의 타입을 표시해주는 한 문자 출력전용 목적, 기본 초기값은 '?'
     */
-    outfile << code << endl;        // Person 객체의 타입을 표시해주는 한 문자 출력전용 목적, 기본 초기값은 '?'
-    outfile << delta << endl;       // 객체가 이동중에 있을 때, 그 객체의 매 시뮬레이션 시간별 x와 y 좌표 변화량
-    outfile << id_num << endl;      // 객체를 유일하게 나타내는 식별자
-    outfile << speed << endl;       // 객체가 매 시각마다 이동하는 속도
-    outfile << location << endl;    // 게임보드 이차원 평면상의 객체의 현재 위치
-    outfile << destination << endl; // 객체가 이동할 경우 최종 목적지의 위치 좌표
-    outfile << health << endl;      // 이 값이 0이 되면 그 객체는 "죽게 된다"
-    outfile << is_moving << endl;   // 객체가 현재 이동중인지 정지 상태인지를 표시함. 이 값이 true 이면 이동중임
-    outfile << name << endl;        // 객체의 이름, string 타입의 변수
+    outfile << baseData.code << endl;   // Person 객체의 타입을 표시해주는 한 문자 출력전용 목적, 기본 초기값은 '?'
+    outfile << baseData.id_num << endl; // 객체를 유일하게 나타내는 식별자
+
+    outfile << baseData.delta << endl; // 객체가 이동중에 있을 때, 그 객체의 매 시뮬레이션 시간별 x와 y 좌표 변화량
+    outfile << baseData.name << endl;  // 객체의 이름, string 타입의 변수
+
+    outfile << baseData.speed << endl; // 객체가 매 시각마다 이동하는 속도
+
+    outfile << baseData.location << endl; // 게임보드 이차원 평면상의 객체의 현재 위치
+
+    outfile << baseData.destination << endl; // 객체가 이동할 경우 최종 목적지의 위치 좌표
+
+    outfile << baseData.health << endl; // 이 값이 0이 되면 그 객체는 "죽게 된다"
+
+    outfile << baseData.is_moving << endl; // 객체가 현재 이동중인지 정지 상태인지를 표시함. 이 값이 true 이면 이동중임
 
     // 파일 닫기 -> 여기서 진행하지 않는다.
 }
@@ -182,14 +157,14 @@ void Person::restore(ifstream& infile) {
     }
 
     // infile >> code; // 이건 빼야 하나. 코드 읽음 -> 적절한 객체 생성 -> 그 객체의 restore 함수 호출. 이렇게 돼야 될거 같은데
-    infile >> delta;
-    infile >> id_num;
-    infile >> speed;
-    infile >> location;
-    infile >> destination;
-    infile >> health;
-    infile >> is_moving;
-    infile >> name;
+    infile >> baseData.delta;
+    infile >> baseData.id_num;
+    infile >> baseData.speed;
+    infile >> baseData.location;
+    infile >> baseData.destination;
+    infile >> baseData.health;
+    infile >> baseData.is_moving;
+    infile >> baseData.name;
 }
 
 void Person::attack_command(int target_id) {
@@ -197,10 +172,10 @@ void Person::attack_command(int target_id) {
 }
 
 void Person::receive_attack(int attacker_id, int attack_point) {
-    if (health - attack_point > 0) {
+    if (baseData.health > attack_point) {
         cout << "Outch!" << endl;
-        health -= attack_point;
+        baseData.health -= attack_point;
     } else {
-        health = 0;
+        baseData.health = 0;
     }
 }
