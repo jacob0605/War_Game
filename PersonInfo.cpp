@@ -10,7 +10,9 @@ void PersonInfo::save(ofstream& outfile) {
         return;
     }
     outfile << code << endl;
-    outfile << id_num << endl;
+    git
+            outfile
+        << id_num << endl;
     outfile << name << endl;
     outfile << health << endl;
     outfile << speed << endl;
