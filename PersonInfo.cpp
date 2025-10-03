@@ -21,4 +21,17 @@ void PersonInfo::save(ofstream& outfile) {
 }
 
 void PersonInfo::restore(std::ifstream& infile) {
+    if (!infile.is_open()) {
+        cerr << "Error, Failed to open file for save data at line " << __LINE__ << " in " << __FILE__ << "\n";
+        return;
+    }
+
+    infile >> id_num;
+    infile >> name;
+    infile >> health;
+    infile >> speed;
+    infile >> is_moving;
+    infile >> location;
+    infile >> destination;
+    infile >> delta;
 }

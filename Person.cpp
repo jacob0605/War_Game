@@ -21,8 +21,8 @@ Person::Person(Game_World* w_ptr, char c, int id, double in_x, double in_y, cons
     // baseData.speed;
     // baseData.is_moving;
     baseData.location = Real_Pair(in_x, in_y);
-    baseData.destination;
-    baseData.delta;
+    // baseData.destination;
+    // baseData.delta;
     baseData.world_ptr = w_ptr;
 }
 
@@ -100,71 +100,18 @@ void Person::save(ofstream& outfile) {
     }
 
     // 정보 저장
-    // outfile<< code << delta << id_num << speed << location << destination << health << is_moving << endl;
-    /*
-    Person 클래스에서 저장해야 할 멤버 변수들
-    private:
-        Real_Pair delta; // 객체가 이동중에 있을 때, 그 객체의 매 시뮬레이션 시간별 x와 y 좌표 변화량
-    protected:
-        int id_num; // 객체를 유일하게 나타내는 식별자
-        double speed; // 객체가 매 시각마다 이동하는 속도
-        Real_Pair location; // 게임보드 이차원 평면상의 객체의 현재 위치
-        Real_Pair destination; // 객체가 이동할 경우 최종 목적지의 위치 좌표
-        int health; // 이 값이 0이 되면 그 객체는 "죽게 된다"
-        bool is_moving; // 객체가 현재 이동중인지 정지 상태인지를 표시함. 이 값이 true 이면 이동중임
-        char code; // Person 객체의 타입을 표시해주는 한 문자 출력전용 목적, 기본 초기값은 '?'
-    */
-    outfile << baseData.code << endl;   // Person 객체의 타입을 표시해주는 한 문자 출력전용 목적, 기본 초기값은 '?'
-    outfile << baseData.id_num << endl; // 객체를 유일하게 나타내는 식별자
-
-    outfile << baseData.delta << endl; // 객체가 이동중에 있을 때, 그 객체의 매 시뮬레이션 시간별 x와 y 좌표 변화량
-    outfile << baseData.name << endl;  // 객체의 이름, string 타입의 변수
-
-    outfile << baseData.speed << endl; // 객체가 매 시각마다 이동하는 속도
-
-    outfile << baseData.location << endl; // 게임보드 이차원 평면상의 객체의 현재 위치
-
-    outfile << baseData.destination << endl; // 객체가 이동할 경우 최종 목적지의 위치 좌표
-
-    outfile << baseData.health << endl; // 이 값이 0이 되면 그 객체는 "죽게 된다"
-
-    outfile << baseData.is_moving << endl; // 객체가 현재 이동중인지 정지 상태인지를 표시함. 이 값이 true 이면 이동중임
+    baseData.save(outfile);
 
     // 파일 닫기 -> 여기서 진행하지 않는다.
 }
 
 void Person::restore(ifstream& infile) {
-    /*
-    이 함수는 제공된 파일로부터 멤버 변수들의 값을 읽어들인다. 단, 이 함수를 호출하기 전에
-    Game_World 객체의 restore 함수가 이미 읽어들인 code 문자는 제외하고 읽는다.
-    world_ptr의 값도 읽어들이지 않는다. (기본값은 0이다.)
-    */
-    /*
-    저장한 순서에 맞게 읽는다.
-        outfile << code << endl; // Person 객체의 타입을 표시해주는 한 문자 출력전용 목적, 기본 초기값은 '?'
-        outfile << delta << endl; // 객체가 이동중에 있을 때, 그 객체의 매 시뮬레이션 시간별 x와 y 좌표 변화량
-        outfile << id_num << endl; // 객체를 유일하게 나타내는 식별자
-        outfile << speed << endl; // 객체가 매 시각마다 이동하는 속도
-        outfile << location << endl; // 게임보드 이차원 평면상의 객체의 현재 위치
-        outfile << destination << endl; // 객체가 이동할 경우 최종 목적지의 위치 좌표
-        outfile << health << endl; // 이 값이 0이 되면 그 객체는 "죽게 된다"
-        outfile << is_moving << endl; // 객체가 현재 이동중인지 정지 상태인지를 표시함. 이 값이 true 이면 이동중임
-    */
     // 파일 에러 체크
     if (!infile.is_open()) {
         cerr << "Error, Failed to open file for save data at line " << __LINE__ << " in " << __FILE__ << "\n";
         return;
     }
-
-    // infile >> code; // 이건 빼야 하나. 코드 읽음 -> 적절한 객체 생성 -> 그 객체의 restore 함수 호출. 이렇게 돼야 될거 같은데
-    infile >> baseData.delta;
-    infile >> baseData.id_num;
-    infile >> baseData.speed;
-    infile >> baseData.location;
-    infile >> baseData.destination;
-    infile >> baseData.health;
-    infile >> baseData.is_moving;
-    infile >> baseData.name;
+    baseData.restore(infile);
 }
 
 void Person::attack_command(int target_id) {

@@ -26,8 +26,8 @@ public:
     int get_health() const noexcept { return baseData.health; }
     void set_health(int hp) { baseData.health = hp; }
     bool get_alive() { return baseData.health > 0; }
-    int get_speed() const noexcept { return baseData.health; }
-    void set_speed(int s) { baseData.speed = s; }
+    double get_speed() const noexcept { return baseData.speed; }
+    void set_speed(double s) { baseData.speed = s; }
     bool is_moving() const noexcept { return baseData.is_moving; }
     Real_Pair get_location() const noexcept { return baseData.location; }
     Real_Pair get_destination() const noexcept { return baseData.destination; }

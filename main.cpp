@@ -17,6 +17,8 @@
 #define FILE_NAME "objwar.svd"
 #define GAME_LOG_FILE "Game.log"
 
+#define DEFAULT_BOARD_SIZE 0
+
 using namespace std;
 
 // 프로그램 컴파일 및 실행 방법
@@ -46,26 +48,16 @@ using namespace std;
 
 int main() { //
 
-    // cout<<endl<< "Cpp camp homework project#3 made by Youngjun Shim (22199422)" <<endl<<endl;
-
-    BoardView b1;
-    // b1.clear();
-
-    // Peasant o1(1, 1, 1), o2(2, 5, 1);
-    // o1 는 Peasant 객체이고, ID = 1, location = (1,1)
-    // o2 는 Peasant 객체이고, ID = 2, location = (5,1)
-
-    // Soldier o3(3, 1, 10), o4(4, 5, 10);
-    // o3 는 Soldier 객체이고, ID = 3, location = (1,10)
-    // o4 는 Soldier 객체이고, ID = 4, location = (5,10)
-
-    Game_World g1;
-
+    // 로그 기록용 파일 open
     ofstream log_file(GAME_LOG_FILE);
     if (!log_file.is_open()) { // 에러 체크
         cerr << "Error, Failed to open file " << GAME_LOG_FILE << " at line " << __LINE__ << " in " << __FILE__ << "\n";
         return 0;
     }
+
+    BoardView b1;
+
+    Game_World g1;
 
     cout << endl
          << "Cpp camp homework project#3 made by Youngjun Shim (22199422)" << endl
@@ -114,12 +106,14 @@ int main() { //
 #endif // _DEBUG
                 do_move_command(log_file, g1);
                 break;
+
             case 'c': // "carry" 명령어, id_num = ID인 객체에 w란 양의 부하를 인가
 #ifdef _DEBUG
                 cout << "command c" << endl;
 #endif // _DEBUG
                 set_load_to_Peasant(log_file, g1);
                 break;
+
             case 's': // "show status" 명령어, id_num = ID인 객체의 상태를 출력
 #ifdef _DEBUG
                 cout << "command s" << endl;
@@ -127,6 +121,7 @@ int main() { //
        // cout<<"command s"<<endl;
                 show_status(log_file, g1);
                 break;
+
             case 'g': // "go" 명령어, 시뮬레이터의 시각을 한단계 전진
 #ifdef _DEBUG
                 cout << "command g" << endl;
@@ -134,6 +129,7 @@ int main() { //
        // time++;
                 go_command(log_file, time, g1);
                 break;
+
             case 'z': // "zoom" 명령어, 게임보드의 출력 눈금 축적을 s로 설정
 #ifdef _DEBUG
                 cout << "command z" << endl;
@@ -141,6 +137,7 @@ int main() { //
                 cin >> scale;
                 b1.set_scale(scale); // BoardView의 스케일을 s로 설정
                 break;
+
             case 'o': // "origin" 명령어, 게임보드의 원점을 (x,y)로 설정
 #ifdef _DEBUG
                 cout << "command o" << endl;
@@ -148,6 +145,7 @@ int main() { //
                 cin >> x >> y;
                 b1.set_origin(x, y);
                 break;
+
             case 'r': // "resize" 명령어, 한 눈금의 크기를 s로 설정
 #ifdef _DEBUG
                 cout << "command r" << endl;
@@ -155,12 +153,14 @@ int main() { //
                 cin >> size;
                 b1.set_size(size); // 출력되는 화면의 크기를 s로 설정
                 break;
+
             case 'n': // "new" 명령어, 새 객체를 추가
 #ifdef _DEBUG
                 cout << "command n" << endl;
 #endif // _DEBUG
                 add_command(log_file, g1);
                 break;
+
             case 'v': // "save" 명령어, 현재 게임의 상태를 파일에 저장
 #ifdef _DEBUG
                 cout << "command v" << endl;
@@ -266,21 +266,6 @@ void draw_board(BoardView& b1, int& time, Game_World& G1) {
     cout << endl;
 }
 
-// void do_move_command(Peasant& o1, Peasant& o2, Soldier& o3, Soldier& o4) {
-//     cout<<"Enter ID x y: ";
-//     int id_num=0;
-//     double x=0, y=0;
-//     cin>> id_num >> x >> y;
-//     Real_Pair c(x,y);
-//     switch(id_num) {
-//         case 1: o1.move_command(c); break;
-//         case 2: o2.move_command(c); break;
-//         case 3: o3.move_command(c); break;
-//         case 4: o4.move_command(c); break;
-//         default: cout<<"Wrong id"<<endl; break;
-//     }
-// }
-
 void do_move_command(ofstream& log_file, Game_World& G1) {
     // cout<<"Enter ID x y: ";
     int id_num = 0;
@@ -297,18 +282,6 @@ void do_move_command(ofstream& log_file, Game_World& G1) {
     G1.get_object_ptr(id_num)->move_command(c);
 }
 
-// void set_load_to_Peasant(Peasant& o1, Peasant& o2) {
-//     cout<<"Enter ID w: ";
-//     int id_num = 0;
-//     double w = 0;
-//     cin>> id_num >> w;
-//     switch(id_num) {
-//         case 1: o1.set_load(w); break;
-//         case 2: o2.set_load(w); break;
-//         default: cout<<"Wrong id"<<endl; break;
-//     }
-// }
-
 void set_load_to_Peasant(ofstream& log_file, Game_World& G1) {
     // cout<<"Enter ID w: ";
     int id_num = 0;
@@ -324,19 +297,6 @@ void set_load_to_Peasant(ofstream& log_file, Game_World& G1) {
     G1.get_object_ptr(id_num)->set_load(w);
 }
 
-// void show_status(Peasant& o1, Peasant& o2, Soldier& o3, Soldier& o4) {
-//     cout<<"Enter ID: ";
-//     int id_num = 0;
-//     cin>> id_num;
-//     switch(id_num) {
-//         case 1: o1.display_status(); break;
-//         case 2: o2.display_status(); break;
-//         case 3: o3.display_status(); break;
-//         case 4: o4.display_status(); break;
-//         default: cout<<"Wrong id"<<endl; break;
-//     }
-// }
-
 void show_status(ofstream& log_file, Game_World& G1) {
     // cout<<"Enter ID: ";
     int id_num = 0;
@@ -351,19 +311,6 @@ void show_status(ofstream& log_file, Game_World& G1) {
     G1.get_object_ptr(id_num)->display_status();
 }
 
-// void go_command(int& time, Peasant& o1, Peasant& o2, Soldier& o3, Soldier& o4) {
-//     /*
-//     시뮬레이터 시각 전진 시키는 명령어
-//     시간 변수 값 1 증가
-//     각 객체들의 상태 갱신
-//     */
-//     time++;
-//     o1.update();
-//     o2.update();
-//     o3.update();
-//     o4.update();
-// }
-
 void go_command(ofstream& log_file, int& time, Game_World& G1) {
     /*
     시뮬레이터 시각 전진 시키는 명령어
@@ -371,10 +318,7 @@ void go_command(ofstream& log_file, int& time, Game_World& G1) {
     각 객체들의 상태 갱신
     */
     time++;
-    // o1.update();
-    // o2.update();
-    // o3.update();
-    // o4.update();
+
     cout << "Game proceed" << endl;
     log_file << "Game proceed" << endl;
     for (int i = 0; i < G1.get_num_objects(); i++) {
@@ -492,41 +436,6 @@ void save_data(ofstream& log_file, Game_World& G1) { // 저장
     // 파일 닫기
     file.close();
 }
-
-// void load_data(ofstream & log_file, Game_World & G1) {
-
-//     cout << "Load game data" << endl;
-//     log_file<< "Load game data" << endl;
-
-//     // 파일 열기
-//     ifstream file(FILE_NAME);
-//     if(!file.is_open()) { // 에러 체크
-//         cerr<<"Error, Failed to open file "<< FILE_NAME <<" at line "<< __LINE__ <<" in "<< __FILE__ <<"\n";
-//         return;
-//     }
-
-//     // 각 객체들의 상태 불러오기
-//     int obj_num = 0;
-//     file >> obj_num;
-//     Person * ptr;
-//     // add_new_object(log_file, G1);
-//     /*
-//     파일에서 code 값을 읽어서 새로운 객체를 생성
-//     그 후 해당 객체의 restore 함수 호출
-//     */
-//     char code = '?';
-//     // file >> code;
-
-//     // G1.set_num_objects(obj_num);
-//     for(int i=0; i<obj_num; i++) {
-//         file >> code;
-//         dynamic_memory_allocate(log_file, G1, code);
-//         G1.get_object_ptr(i)->restore(file);
-//     }
-
-//     // 파일 닫기
-//     file.close();
-// }
 
 void load_data(ofstream& log_file, Game_World& G1) {
 
