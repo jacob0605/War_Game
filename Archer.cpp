@@ -8,6 +8,7 @@ using namespace std;
 
 void Archer::initialize() {
     Warrior::initialize(2, 10);
+    baseData.code = 'A';
     set_health(10);
     set_speed(7);
 }
@@ -24,8 +25,8 @@ Archer::Archer(Game_World* w_ptr) : Warrior(w_ptr) {
     initialize();
 }
 
-Archer::Archer(Game_World* w_ptr, int id, double x, double y, const string& _name)
-    : Warrior(w_ptr, 'A', id, x, y, _name) {
+Archer::Archer(Game_World* w_ptr, int id, double x, double y, const char* name_value)
+    : Warrior(w_ptr, 'A', id, x, y, name_value) {
     initialize();
 }
 
@@ -101,6 +102,7 @@ void Archer::update() {
 
 void Archer::display_status() {
     const Real_Pair location = get_location();
+    Person::display_status();
 
     if (baseData.health > 0) {
         cout << "Archer ID: " << baseData.id_num << " at (" << location.x << ", " << location.y << ") is alive" << endl;

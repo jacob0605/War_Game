@@ -1,28 +1,33 @@
 #ifndef __PERSON__
 #define __PERSON__
 
+#include <cstddef>
 #include <fstream>
-#include "Real_Pair.h"
+
 #include "PersonInfo.h"
-// #include "Game_World.h"
+#include "Real_Pair.h"
 
 class Game_World;
 class Person {
 protected:
     PersonInfo baseData;
+
     void update_location();
 
 public:
-    Person() {};
-    Person(Game_World* w_ptr);
-    Person(Game_World* w_ptr, char c, int id, double in_x, double in_y, const std::string& _name);
-    virtual ~Person() {};
+    Person();
+    explicit Person(Game_World* w_ptr);
+    Person(Game_World* w_ptr, char c, int id, double in_x, double in_y, const char* name_value);
+    virtual ~Person();
+
+    Person(const Person&) = delete;
+    Person& operator=(const Person&) = delete;
 
     // 기본 정보
     char get_code() const noexcept { return baseData.code; }
     int get_ID() { return baseData.id_num; }
-    std::string get_name() const noexcept { return baseData.name; }
-    void set_name(const std::string& _name) { baseData.name = _name; }
+    const char* get_name() const noexcept { return baseData.get_name(); }
+    void set_name(const char* new_name) { baseData.set_name(new_name); }
     int get_health() const noexcept { return baseData.health; }
     void set_health(int hp) { baseData.health = hp; }
     bool get_alive() { return baseData.health > 0; }
@@ -33,7 +38,7 @@ public:
     Real_Pair get_destination() const noexcept { return baseData.destination; }
     Real_Pair get_delta() const noexcept { return baseData.delta; }
 
-    // 동작 관련 (순수 가상 또는 virtual)
+    // 동작 (필요에 따라 virtual)
     virtual void update() = 0;
     virtual void display_status();
     virtual void move_command(Real_Pair destination);
@@ -44,6 +49,8 @@ public:
     // 저장/복원
     virtual void save(std::ofstream& outfile);
     virtual void restore(std::ifstream& infile);
+
+    static constexpr std::size_t get_max_name_length() { return PersonInfo::NAME_CAP; }
 };
 
 #include "Game_World.h"

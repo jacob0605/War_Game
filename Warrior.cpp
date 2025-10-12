@@ -27,8 +27,8 @@ Warrior::Warrior(Game_World* w_ptr) : Person(w_ptr) {
     initialize();
 }
 
-Warrior::Warrior(Game_World* w_ptr, char c, int id, double x, double y, const string& _name)
-    : Person(w_ptr, c, id, x, y, _name) {
+Warrior::Warrior(Game_World* w_ptr, char c, int id, double x, double y, const char* name_value)
+    : Person(w_ptr, c, id, x, y, name_value) {
     initialize();
 }
 

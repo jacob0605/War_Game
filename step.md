@@ -11,22 +11,25 @@
 - **버그 메모:** `Peasant::display_status()`가 존재하지 않는 `location`/`destination` 멤버에 직접 접근해 링킹 실패가 발생했고, `Person`의 캡슐화된 접근자(`get_location`, `get_destination`)를 사용하도록 수정해 리스트 마이그레이션 이후에도 정상 컴파일됩니다.
 - **버그 메모:** Warrior/Soldier/Archer가 `Person`의 제거된 멤버들(`id_num`, `location`, `world_ptr`, `health` 등)에 직접 접근해 컴파일이 실패했으며, `baseData`와 접근자들을 사용하도록 수정하고 월드 포인터 유효성 검사를 추가해 문제를 해소했다.
 ## 단계 2: Person 객체에 이름과 소멸자 추가
-- [ ] Person 클래스에 동적 char 배열(name) 멤버를 추가하고 최대 128자 이름을 입력 받아 저장한다.
-- [ ] new 명령 처리 시 사용자에게 이름을 받아 저장하고 필요한 임시 버퍼를 관리한다.
-- [ ] display_status/restore/save 등 관련 멤버 함수에 이름 출력과 저장 로직을 반영한다.
-- [ ] Person 및 파생 클래스의 소멸자에서 "Soldier Jack is deallocated" 형식 메시지를 출력한다.
-- [ ] Person의 복사 생성자와 대입 연산자를 private으로 선언해 이름 버퍼가 잘못 복사되지 않도록 제한한다.
+- [x] PersonInfo에 이름용 char 버퍼를 두고 최대 128자 이름을 입력 받아 관리한다.
+- [x] new 명령 처리 시 사용자에게 이름을 받아 저장하고 필요한 임시 버퍼를 관리한다.
+- [x] display_status/restore/save 등 관련 멤버 함수에 이름 출력과 저장 로직을 반영한다.
+- [x] Person 및 파생 클래스의 소멸자에서 "Soldier Jack is deallocated" 형식 메시지를 출력한다.
+- [x] Person의 복사 생성자와 대입 연산자를 private으로 선언해 이름 버퍼가 잘못 복사되지 않도록 제한한다.
+- **버그 메모:** 기존 문자열 기반 이름 처리와 char 버퍼 요구 사항이 충돌해 PersonInfo 내부에 이름 버퍼를 두고 Person은 접근자만 노출하도록 재구성하고 저장/복원 및 new 명령 흐름을 전부 갱신했다.
 
 ## 단계 3: 연결 리스트로 Game_World 수정
-- [ ] Game_World의 Person 포인터 배열을 Linked_List<Person *> 기반 구조로 교체하고 관련 멤버를 갱신한다.
-- [ ] update_all_object()와 generate_display() 등 main에서 호출할 새 public 멤버 함수를 정의한다.
-- [ ] get_object_ptr()를 리스트 순회 방식으로 다시 구현하고 존재하지 않을 때 0을 반환한다.
-- [ ] get_new_ID() 함수를 추가해 새로운 객체에 사용 가능한 ID를 배정한다.
-- [ ] 'd' 명령을 추가해 모든 객체의 display_status()를 호출하고 이름이 알파벳 순으로 출력되도록 한다.
-- [ ] update 중 dead 상태 객체를 리스트에서 제거하고 메모리를 반환하며 필요 시 is_attacking을 false로 리셋한다.
-- [ ] start_scan()/get_next_scan_ptr()를 추가해 스캔 전용 iterator 상태를 캡슐화하고 Archer 검색 로직을 지원한다.
-- [ ] save()에서 Linked_List 복사 생성자와 대입 연산자를 호출해 동작을 검증하고 소멸자 메시지가 기대대로 출력되는지 확인한다.
+- [x] Game_World의 Person 포인터 배열을 Linked_List<Person *> 기반 구조로 교체하고 관련 멤버를 갱신한다.
+- [x] update_all_object()와 generate_display() 등 main에서 호출할 새 public 멤버 함수를 정의한다.
+- [x] get_object_ptr()를 리스트 순회 방식으로 다시 구현하고 존재하지 않을 때 0을 반환한다.
+- [x] get_new_ID() 함수를 추가해 새로운 객체에 사용 가능한 ID를 배정한다.
+- [x] 'd' 명령을 추가해 모든 객체의 display_status()를 호출하고 이름이 알파벳 순으로 출력되도록 한다.
+- [x] update 중 dead 상태 객체를 리스트에서 제거하고 메모리를 반환하며 필요 시 is_attacking을 false로 리셋한다.
+- [x] start_scan()/get_next_scan_ptr()를 추가해 스캔 전용 iterator 상태를 캡슐화하고 Archer 검색 로직을 지원한다.
+- [x] save()에서 Linked_List 복사 생성자와 대입 연산자를 호출해 동작을 검증하고 소멸자 메시지가 기대대로 출력되는지 확인한다.
 
+- **변경 메모:** Game_World에 update_all_object()/generate_display()/start_scan() 등을 추가해 링크드 리스트 기반 흐름을 캡슐화했고, main 명령들이 새 API와 정렬 로직을 사용하도록 재작성했다.
+- **버그 메모:** 배열 인덱스로 ID를 가정하던 경로를 전부 연결 리스트 순회로 바꾸고, 이름 순 정렬/ID 재할당/스캔용 이터레이터를 Game_World에서 캡슐화해 ID 중복과 누락 문제를 해결했다.
 ## 단계 4: 예외 처리 도입
 - [ ] 문자열 메시지를 보관하는 bad_input 예외 클래스를 정의한다.
 - [ ] 입력 검증 구간마다 잘못된 경우 "throw bad_input("Error ...")" 형태로 예외를 발생시킨다.

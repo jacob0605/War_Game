@@ -122,6 +122,26 @@ int main() { //
                 show_status(log_file, g1);
                 break;
 
+            case 'd': // "display" all statuses in alphabetical order
+#ifdef _DEBUG
+                cout << "command d" << endl;
+#endif // _DEBUG
+                cout << "Display all objects" << endl;
+                log_file << "Display all objects" << endl;
+                g1.start_scan();
+                {
+                    bool shown = false;
+                    while (Person* person = g1.get_next_scan_ptr()) {
+                        shown = true;
+                        person->display_status();
+                    }
+                    if (!shown) {
+                        log_file << "There is no character, make new one" << endl;
+                        cout << "There is no character, make new one" << endl;
+                    }
+                }
+                break;
+
             case 'g': // "go" 명령어, 시뮬레이터의 시각을 한단계 전진
 #ifdef _DEBUG
                 cout << "command g" << endl;
@@ -222,25 +242,19 @@ int main() { //
     return 0;
 } // main() 끝
 
-bool is_right_id(Game_World& G1, int id) { // 입력한 id가 적절한 id인지 검사하는 함수
-    /*
-    입력한 아이디가 적절한 숫자인 경우 true를 리턴
-    그렇지 않은 경우 false를 리턴함.
-        부적절한 id임을 알리는 메시지 출력
-    이 함수를 if문의 조건문으로 사용하며, !를 붙여 부적절한 입력인 경우에만 작동.
-    */
-    int max_num = G1.get_num_objects();
-    if (0 <= id && id < max_num) { // 적절한 id
-        return true;
-    } else {
-        if (max_num == 0) {
-            cout << "There is no character, make new one" << endl;
-        } else {
-            cout << "Wrong ID, max ID is " << max_num << endl;
-        }
-        return false;
+Person* get_person_or_warn(Game_World& G1, int id) {
+    Person* person = G1.get_object_ptr(id);
+    if (person) {
+        return person;
     }
+    if (G1.get_num_objects() == 0) {
+        cout << "There is no character, make new one" << endl;
+    } else {
+        cout << "Wrong ID: " << id << endl;
+    }
+    return nullptr;
 }
+
 
 // void draw_board(BoardView& b1, int& time, Peasant& o1, Peasant& o2, Soldier& o3, Soldier& o4) {
 //     cout<<endl;
@@ -255,14 +269,11 @@ bool is_right_id(Game_World& G1, int id) { // 입력한 id가 적절한 id인지
 // }
 
 void draw_board(BoardView& b1, int& time, Game_World& G1) {
-    int num = G1.get_num_objects();
     cout << endl;
-    cout << "Time: " << time << endl; // 시뮬레이터 시각 출력
+    cout << "Time: " << time << endl;
     b1.clear();
-    for (int i = 0; i < num; i++) {
-        b1.plot(G1.get_object_ptr(i));
-    }
-    b1.draw(); // 게임보드 출력
+    G1.generate_display(b1);
+    b1.draw();
     cout << endl;
 }
 
@@ -272,44 +283,45 @@ void do_move_command(ofstream& log_file, Game_World& G1) {
     double x = 0, y = 0;
     cin >> id_num >> x >> y;
     Real_Pair c(x, y);
-    if (!(is_right_id(G1, id_num))) {
+    Person* target = get_person_or_warn(G1, id_num);
+    if (!target) {
         return;
     }
-    cout << "Move id: " << id_num << " to " << x << ',' << y << endl;
-    log_file << "Move id: " << id_num << " to " << x << ',' << y << endl;
-    // id_num --; // id 번호보다 대상의 인덱스가 1 작음.
-    // id 0부터 시작함. 인덱스랑 같음. 따라서 감소시킬 필요 없음. 정확히는 감소 시키면 안됨.
-    G1.get_object_ptr(id_num)->move_command(c);
+    cout << "Move id: " << id_num << " to " << x << "," << y << endl;
+    log_file << "Move id: " << id_num << " to " << x << "," << y << endl;
+    target->move_command(c);
 }
+
+
 
 void set_load_to_Peasant(ofstream& log_file, Game_World& G1) {
     // cout<<"Enter ID w: ";
     int id_num = 0;
     double w = 0;
     cin >> id_num >> w;
-    if (!(is_right_id(G1, id_num))) { // id 입력에 대한 검사
+    Person* target = get_person_or_warn(G1, id_num);
+    if (!target) {
         return;
     }
     cout << "Set load " << w << " to " << id_num << endl;
     log_file << "Set load " << w << " to " << id_num << endl;
-    // id_num--; // id 번호보다 index가 1 작음. 따라서 인덱스로 사용하기 위해 id_num의 값을 1 감소
-    // id 0부터 시작함. 인덱스랑 같음. 따라서 감소시킬 필요 없음. 정확히는 감소 시키면 안됨.
-    G1.get_object_ptr(id_num)->set_load(w);
+    target->set_load(w);
 }
+
 
 void show_status(ofstream& log_file, Game_World& G1) {
     // cout<<"Enter ID: ";
     int id_num = 0;
     cin >> id_num;
-    if (!(is_right_id(G1, id_num))) { // id 입력에 대한 검사
+    Person* target = get_person_or_warn(G1, id_num);
+    if (!target) {
         return;
     }
     cout << "Show ID(" << id_num << ") status" << endl;
     log_file << "Show ID(" << id_num << ") status" << endl;
-    // id_num--; // id 번호보다 index가 1 작음. 따라서 인덱스로 사용하기 위해 id_num의 값을 1 감소
-    // id 0부터 시작함. 인덱스랑 같음. 따라서 감소시킬 필요 없음. 정확히는 감소 시키면 안됨.
-    G1.get_object_ptr(id_num)->display_status();
+    target->display_status();
 }
+
 
 void go_command(ofstream& log_file, int& time, Game_World& G1) {
     /*
@@ -321,12 +333,11 @@ void go_command(ofstream& log_file, int& time, Game_World& G1) {
 
     cout << "Game proceed" << endl;
     log_file << "Game proceed" << endl;
-    for (int i = 0; i < G1.get_num_objects(); i++) {
-        G1.get_object_ptr(i)->update();
-    }
+    G1.update_all_object();
 }
 
-void dynamic_memory_allocate(ofstream& log_file, Game_World& G1, const string& _name, char type, double x, double y) {
+
+void dynamic_memory_allocate(ofstream& log_file, Game_World& G1, const char* name, char type, double x, double y) {
 
     // add_command 함수에서 메모리 동적 할당 부분만 여기로 옮길 예정
     // 함수의 타입을 void로 해서 하는게 좋을까 아니면 Person * 타입으로 해서 리턴값을 가지게 하는 게 좋을까.
@@ -338,12 +349,12 @@ void dynamic_memory_allocate(ofstream& log_file, Game_World& G1, const string& _
     log_file << "Dynamic memory allocate function called" << endl;
 
     Person* ptr = nullptr;
-    int id = G1.get_num_objects();
+    int id = G1.get_new_ID();
     bool is_success = false;
 
     switch (type) {
         case 'P':
-            ptr = new Peasant(&G1, id, x, y, _name);
+            ptr = new Peasant(&G1, id, x, y, name);
             if (ptr == nullptr) {
                 cerr << "Failed to allocate memory in Line " << __LINE__ << " of " << __FILE__ << endl;
                 // exit(-1);
@@ -354,7 +365,7 @@ void dynamic_memory_allocate(ofstream& log_file, Game_World& G1, const string& _
             log_file << "Make new character, type: " << type << " at " << x << ", " << y << endl;
             break; // Peasant 객체 생성
         case 'S':
-            ptr = new Soldier(&G1, id, x, y, _name);
+            ptr = new Soldier(&G1, id, x, y, name);
             if (ptr == nullptr) {
                 cerr << "Failed to allocate memory in Line " << __LINE__ << " of " << __FILE__ << endl;
                 // exit(-1);
@@ -365,7 +376,7 @@ void dynamic_memory_allocate(ofstream& log_file, Game_World& G1, const string& _
             log_file << "Make new character, type: " << type << " at " << x << ", " << y << endl;
             break; // Soldier 객체 생성
         case 'A':
-            ptr = new Archer(&G1, id, x, y, _name);
+            ptr = new Archer(&G1, id, x, y, name);
             if (ptr == nullptr) {
                 cerr << "Failed to allocate memory in Line " << __LINE__ << " of " << __FILE__ << endl;
                 // exit(-1);
@@ -404,38 +415,24 @@ void add_command(ofstream& log_file, Game_World& G1) {
     char type;
     double x;
     double y;
-    string name;
+    char name_buffer[Person::get_max_name_length() + 1] = {0};
 
     // cout<< "Enter type('P' or 'S' or 'A') x y" << endl;
-    cin >> type >> x >> y >> name;
+    cin >> type >> x >> y;
+    cin >> std::setw(static_cast<int>(Person::get_max_name_length()) + 1) >> name_buffer;
     type = toupper(type);                                                                      // 타입을 소문자로 입력할 경우를 대비, 대문자로 전환
-    cout << "type : " << type << ", x = " << x << ", y = " << y << ", name: " << name << endl; // 확인용 코드
+    cout << "type : " << type << ", x = " << x << ", y = " << y << ", name: " << name_buffer << endl; // 확인용 코드
 
-    dynamic_memory_allocate(log_file, G1, name, type, x, y);
+    dynamic_memory_allocate(log_file, G1, name_buffer, type, x, y);
 }
 
-void save_data(ofstream& log_file, Game_World& G1) { // 저장
+void save_data(ofstream& log_file, Game_World& G1) {
 
     cout << "Save game data" << endl;
     log_file << "Save game data" << endl;
-
-    // 파일 열기
-    ofstream file(FILE_NAME);
-    if (!file.is_open()) { // 에러 체크
-        cerr << "Error, Failed to open file " << FILE_NAME << " at line " << __LINE__ << " in " << __FILE__ << "\n";
-        return;
-    }
-
-    // 각 객체들의 상태 저장
-    int num = G1.get_num_objects();
-    file << num << endl;
-    for (int i = 0; i < num; i++) {
-        G1.get_object_ptr(i)->save(file);
-    }
-
-    // 파일 닫기
-    file.close();
+    G1.save();
 }
+
 
 void load_data(ofstream& log_file, Game_World& G1) {
 
@@ -479,11 +476,14 @@ void attack(std::ofstream& log_file, Game_World& G1) {
     int id1 = 0;
     int id2 = 0;
     cin >> id1 >> id2;
-    if (!(is_right_id(G1, id1) && is_right_id(G1, id2))) { // id 입력에 대한 검사
+    Person* attacker = get_person_or_warn(G1, id1);
+    Person* target = get_person_or_warn(G1, id2);
+    if (!(attacker && target)) {
         return;
     }
-    G1.get_object_ptr(id1)->attack_command(id2);
+    attacker->attack_command(target->get_ID());
 }
+
 
 void show_command_list() {
 
@@ -500,6 +500,10 @@ void show_command_list() {
     cout << "s ID - \"show status\" command" << endl;
     cout << ": It is a command that outputs the state of the object with id_num = ID." << endl;
     cout << endl;
+    cout << "d - \"display\" command" << endl;
+    cout << ": Display all objects in alphabetical order." << endl;
+    cout << endl;
+
 
     cout << "g - \"go\" command" << endl;
     cout << ": It is a command that takes the simulator's perspective to the next level." << endl;
@@ -517,8 +521,8 @@ void show_command_list() {
     cout << ": It is a command that sets the size of a scale to s." << endl;
     cout << endl;
 
-    cout << "n c x y - \"new\" command" << endl;
-    cout << ": Create a new object and add it to Game_World." << endl;
+    cout << "n c x y name - \"new\" command" << endl;
+    cout << ": Create a new object at (x,y) and assign up to 128-char name." << endl;
     cout << endl;
 
     cout << "v - \"save\" command." << endl;

@@ -6,17 +6,18 @@
 
 using namespace std;
 
-Soldier::Soldier() : Warrior() {}
+Soldier::Soldier() : Warrior() { baseData.code = 'S'; }
 
 Soldier::Soldier(int id, double x, double y) : Warrior() {
+    baseData.code = 'S';
     baseData.id_num = id;
     baseData.location = Real_Pair(x, y);
 }
 
-Soldier::Soldier(Game_World* w_ptr) : Warrior(w_ptr) {}
+Soldier::Soldier(Game_World* w_ptr) : Warrior(w_ptr) { baseData.code = 'S'; }
 
-Soldier::Soldier(Game_World* w_ptr, int id, double x, double y, const string& _name)
-    : Warrior(w_ptr, 'S', id, x, y, _name) {}
+Soldier::Soldier(Game_World* w_ptr, int id, double x, double y, const char* name_value)
+    : Warrior(w_ptr, 'S', id, x, y, name_value) { baseData.code = 'S'; }
 
 void Soldier::update() {
     if (!get_alive()) {
@@ -53,6 +54,7 @@ void Soldier::update() {
 
 void Soldier::display_status() {
     const Real_Pair location = get_location();
+    Person::display_status();
 
     if (baseData.health > 0) {
         cout << "Soldier ID: " << baseData.id_num << " at (" << location.x << ", " << location.y << ") is alive" << endl;

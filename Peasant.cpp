@@ -16,6 +16,7 @@ void Peasant::initialize() {
         load = 0
         capacity = 50
     */
+    baseData.code = 'P';
     baseData.health = 10;
     max_speed = 5;
     load = 0;
@@ -53,7 +54,7 @@ Peasant::Peasant(Game_World* w_ptr) : Person(w_ptr) {
     initialize();
 }
 
-Peasant::Peasant(Game_World* w_ptr, int id, double x, double y, const string& _name) : Person(w_ptr, 'P', id, x, y, _name) {
+Peasant::Peasant(Game_World* w_ptr, int id, double x, double y, const char* name_value) : Person(w_ptr, 'P', id, x, y, name_value) {
     // id_num = id;
     // location.x = x;
     // location.y = y;
@@ -104,6 +105,7 @@ void Peasant::display_status() {
     */
     // char alive_dead[2][6] = { "alive", "dead" };
     // int is_alive = 0;
+    Person::display_status();
     if (baseData.health > 0) { // get_alive() == true
         // is_alive = 0;
         const Real_Pair location = get_location();
