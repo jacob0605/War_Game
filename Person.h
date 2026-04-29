@@ -2,50 +2,59 @@
 #define __PERSON__
 
 #include <fstream>
+#include <string>
+
 #include "Real_Pair.h"
-#include "PersonInfo.h"
-// #include "Game_World.h"
 
 class Game_World;
+
 class Person {
-protected:
-    PersonInfo baseData;
-    void update_location();
-
 public:
-    Person() {};
-    Person(Game_World* w_ptr);
-    Person(Game_World* w_ptr, char c, int id, double in_x, double in_y, const std::string& _name);
-    virtual ~Person() {};
+    Person(const Person&) = delete;
+    Person& operator=(const Person&) = delete;
+    virtual ~Person();
 
-    // 기본 정보
-    char get_code() const noexcept { return baseData.code; }
-    int get_ID() { return baseData.id_num; }
-    std::string get_name() const noexcept { return baseData.name; }
-    void set_name(const std::string& _name) { baseData.name = _name; }
-    int get_health() const noexcept { return baseData.health; }
-    void set_health(int hp) { baseData.health = hp; }
-    bool get_alive() { return baseData.health > 0; }
-    int get_speed() const noexcept { return baseData.health; }
-    void set_speed(int s) { baseData.speed = s; }
-    bool is_moving() const noexcept { return baseData.is_moving; }
-    Real_Pair get_location() const noexcept { return baseData.location; }
-    Real_Pair get_destination() const noexcept { return baseData.destination; }
-    Real_Pair get_delta() const noexcept { return baseData.delta; }
+    char get_code() const noexcept { return code; }
+    int get_ID() const noexcept { return id_num; }
+    const char* get_name() const noexcept { return name != nullptr ? name : ""; }
+    int get_health() const noexcept { return health; }
+    double get_speed() const noexcept { return speed; }
+    bool get_alive() const noexcept { return health > 0; }
+    bool is_moving() const noexcept { return moving; }
+    Real_Pair get_location() const noexcept { return location; }
+    Real_Pair get_destination() const noexcept { return destination; }
+    Real_Pair get_delta() const noexcept { return delta; }
 
-    // 동작 관련 (순수 가상 또는 virtual)
+    void set_health(int hp) { health = hp; }
+    void set_speed(double new_speed) { speed = new_speed; }
+
+    virtual const char* get_type_name() const noexcept = 0;
     virtual void update() = 0;
     virtual void display_status();
-    virtual void move_command(Real_Pair destination);
+    virtual void move_command(Real_Pair new_destination);
     virtual void set_load(double in_load);
     virtual void attack_command(int target_id);
     virtual void receive_attack(int attacker_id, int attack_point);
-
-    // 저장/복원
     virtual void save(std::ofstream& outfile);
     virtual void restore(std::ifstream& infile);
-};
 
-#include "Game_World.h"
+protected:
+    explicit Person(Game_World* w_ptr = nullptr);
+    Person(Game_World* w_ptr, char c, int id, double in_x, double in_y, const std::string& in_name);
+
+    void set_name(const std::string& in_name);
+    void update_location();
+
+    Game_World* world_ptr;
+    char code;
+    int id_num;
+    char* name;
+    int health;
+    double speed;
+    bool moving;
+    Real_Pair location;
+    Real_Pair destination;
+    Real_Pair delta;
+};
 
 #endif // __PERSON__

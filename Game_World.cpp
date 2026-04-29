@@ -1,180 +1,208 @@
-
-#include <iostream>
+#include <cstring>
 #include <fstream>
+#include <iostream>
+
+#include "Archer.h"
+#include "BoardView.h"
+#include "Game_World.h"
+#include "Observer.h"
 #include "Peasant.h"
 #include "Soldier.h"
-#include "Archer.h"
-#include "Game_World.h"
 
-#define SAVE_FILE "objwar.svd" // 저장할 파일의 이름
-// #define MAX_OBJECTS_COUNT 10 // 생성할 수 있는 총 객체의 수를 메크로로 설정, 값은 10으로 설정
+#define SAVE_FILE "objwar.svd"
 
 using namespace std;
 
-Game_World::Game_World() {
-// for(int i=0; i<MAX_OBJECTS_COUNT; i++) {
-//     objptr[i] = nullptr;
-// }
-// max_num_objects = MAX_OBJECTS_COUNT; // 생성할 수 있는 객체의 총 개수, 기본값 10
-#ifdef _DEBUG
-    cout << "Game_World constructor called" << endl; // 확인용 코드
-#endif                                               // _DEBUG
-    num_objects = 0;                                 // 현재 존재하는 객체의 수, 기본값 0
-    iterator.reset_from_list(objptr);
+Game_World::Game_World() : scan_iter(), current_time(1) {
+    scan_iter.reset_from_list(obj_list);
 }
 
 Game_World::~Game_World() {
     clear();
-#ifdef _DEBUG
-    cout << "Game_World destructor called" << endl; // 확인용 코드
-#endif                                              // _DEBUG
 }
 
-void Game_World::set_num_objects(int num) {
-    this->num_objects = num;
+int Game_World::get_new_ID() const {
+    int candidate = 0;
+
+    while (true) {
+        bool used = false;
+        Linked_List_Iterator<Person*> iter(const_cast<Linked_List<Person*>&>(obj_list));
+        while (!iter.at_end()) {
+            Person* person = iter.access_at_iterator();
+            if (person != nullptr && person->get_ID() == candidate) {
+                used = true;
+                break;
+            }
+            iter.advance();
+        }
+
+        if (!used) {
+            return candidate;
+        }
+        ++candidate;
+    }
 }
 
-// bool Game_World::has_space() {
-//     // 추가의 객체를 위한 포인터를 저장할 장소가 배열에 남아 있는지 점검하여 true/false를 반환한다.
-//     if(num_objects < max_num_objects) { // 현재 객체의 수 < 존재 가능한 총 객체의 수
-//         return true;
-//     } else {
-//         return false;
-//     }
-// }
-
-Person* Game_World::get_object_ptr(int id) { // ID가 i인 객체의 포인터를 반환한다.
-    while (!iterator.at_end()) {
-        Person* person = iterator.access_at_iterator();
-        if (person && person->get_ID() == id) {
+Person* Game_World::get_object_ptr(int id) const {
+    Linked_List_Iterator<Person*> iter(const_cast<Linked_List<Person*>&>(obj_list));
+    while (!iter.at_end()) {
+        Person* person = iter.access_at_iterator();
+        if (person != nullptr && person->get_ID() == id) {
             return person;
         }
+        iter.advance();
     }
-#ifdef _DEBUG
-    cout << "There is no Person that have such ID" << endl;
-#endif
     return nullptr;
 }
 
-void Game_World::add_object(Person* ptr) { // 완성할 것, 완성한 듯?
-    // 주어진 객체의 포인터 값을 포인터 배열의 다음 빈자리에 저장한다.
-    // 만약 빈자리가 없으면 false를 반환한다.
-    /*
-    ***** 메모 *****
-    메모리 반납을 소멸자를 활용하면 되겠지 라고 교수님이 말했었음.
-    따로 delete를 써서 메모리 반납을 해주는 방법이 아니라 소멸자에 delete를 넣으면
-    어떻게 될까? 아니다. 반납할때 소멸자를 호출하는데 호출하면 반납한다는건 말이
-    안되는거 같은데
-
-    함수의 타입을 bool에서 void로 바꿨고, Person * ptr 라는 인자를 없앨까
-
-    project_03 폴더 밑에 있는 test 폴더 속 ptr_test02.cpp에서 이 문제 해결함.
-    동적 할당한 메모리를 인자로 넘겨받아 배열에 저장하고 동적 할당했던 함수가
-    종료되면 할당한 메모리에 대한 반납은 배열에서 책임지게 됨
-    */
-    // if (has_space()) {
-    //     if (objptr[num_objects] == nullptr) {
-    //         objptr[num_objects] = ptr;
-    //         cout << "\tmemory allocated to objptr[" << num_objects << "]"
-    //              << endl; // 확인용 코드
-    //         cout << "\tbefore memory allocate, num_objects is " << num_objects
-    //              << endl; // 확인용 코드
-    //         num_objects++;
-    //         cout << "\tafter memory allocate, num_objects is " << num_objects
-    //              << endl; // 확인용 코드
-    //     }
-
-    // } else {
-    //     if (ptr != nullptr) {
-    //         delete ptr;
-    //         ptr = nullptr;
-    //     }
-    //     cout << "there is no space to add new object" << endl;
-    // }
-    objptr.add_at_back(ptr);
-}
-
-void Game_World::save() { // 정보 저장 파트 작성할 것.
-    // 현재 게임상에 존재하는 모든 객체의 타입과 정보를 "objwar.svd" 파일에 저장한다.
-
-    // 파일 열기 및 에러 체크
-    ofstream saveFile(SAVE_FILE);
-    if (!saveFile.is_open()) {
-        cerr << "Error, Failed to open file " << SAVE_FILE << " at line " << __LINE__ << " in " << __FILE__ << "\n";
+void Game_World::add_object(Person* ptr) {
+    if (ptr == nullptr) {
         return;
     }
 
-    // 정보 저장
-    /*
-    파일을 열고 반복문을 사용해서 최대 10개의 객체에 대한 정보들을 순서대로 저장.
-    각 객체의 save 함수 호출
-    */
-    // saveFile<< max_num_objects << endl; // 생성 가능한 총 객체의 수 저장
-    saveFile << num_objects << endl; // 현재 생성된 객체의 수 저장
-    // for (int i = 0; i < max_num_objects; i++) {
-    //     if (objptr[i] != nullptr) {
-    //         objptr[i]->save(saveFile);
-    //     }
-    // }
-    while (!iterator.at_end()) {
-        Person* person = iterator.access_at_iterator();
-        if (person) {
-            person->save(saveFile);
+    Linked_List_Iterator<Person*> iter(obj_list);
+    while (!iter.at_end()) {
+        Person* current = iter.access_at_iterator();
+        if (current != nullptr && std::strcmp(ptr->get_name(), current->get_name()) < 0) {
+            iter.insert_before_iterator(ptr);
+            return;
+        }
+        iter.advance();
+    }
+
+    obj_list.add_at_back(ptr);
+}
+
+void Game_World::display_all_objects() {
+    Linked_List_Iterator<Person*> iter(obj_list);
+    while (!iter.at_end()) {
+        Person* person = iter.access_at_iterator();
+        if (person != nullptr) {
+            person->display_status();
+        }
+        iter.advance();
+    }
+}
+
+void Game_World::update_all_objects() {
+    Linked_List_Iterator<Person*> iter(obj_list);
+    while (!iter.at_end()) {
+        Person* person = iter.access_at_iterator();
+        if (person != nullptr) {
+            person->update();
+        }
+        iter.advance();
+    }
+
+    iter.reset_from_list(obj_list);
+    while (!iter.at_end()) {
+        Person* person = iter.access_at_iterator();
+        if (person != nullptr && !person->get_alive()) {
+            delete person;
+            iter.remove_at_iterator();
+        } else {
+            iter.advance();
         }
     }
 
-    // 파일 닫기
-    saveFile.close();
+    scan_iter.reset_from_list(obj_list);
+}
+
+void Game_World::generate_display(BoardView& board) const {
+    Linked_List_Iterator<Person*> iter(const_cast<Linked_List<Person*>&>(obj_list));
+    while (!iter.at_end()) {
+        board.plot(iter.access_at_iterator());
+        iter.advance();
+    }
+}
+
+void Game_World::start_scan() {
+    scan_iter.reset_from_list(obj_list);
+}
+
+Person* Game_World::get_next_scan_ptr() {
+    if (scan_iter.at_end()) {
+        return nullptr;
+    }
+
+    Person* current = scan_iter.access_at_iterator();
+    scan_iter.advance();
+    return current;
+}
+
+void Game_World::save() {
+    ofstream save_file(SAVE_FILE);
+    if (!save_file.is_open()) {
+        cerr << "Error, Failed to open file " << SAVE_FILE << endl;
+        return;
+    }
+
+    Linked_List<Person*> copy_list(obj_list);
+    obj_list = copy_list;
+    scan_iter.reset_from_list(obj_list);
+
+    save_file << current_time << endl;
+    save_file << get_num_objects() << endl;
+
+    Linked_List_Iterator<Person*> iter(obj_list);
+    while (!iter.at_end()) {
+        Person* person = iter.access_at_iterator();
+        if (person != nullptr) {
+            person->save(save_file);
+        }
+        iter.advance();
+    }
 }
 
 void Game_World::restore() {
-    // clear() 함수를 이용해서 현재의 모든 객체를 삭제한 뒤에,
-    // "objwar.svd" 파일에서 읽어들인 객체들을 게임상에 원상태로 복귀한다.
-    clear();
-    ifstream saveFile(SAVE_FILE);
-    if (!saveFile.is_open()) {
-        cerr << "Error, Failed to open file " << SAVE_FILE << " at line " << __LINE__ << " in " << __FILE__ << "\n";
+    ifstream save_file(SAVE_FILE);
+    if (!save_file.is_open()) {
+        cerr << "Error, Failed to open file " << SAVE_FILE << endl;
         return;
     }
 
-    char type;
-    saveFile >> num_objects;
-    for (int i = 0; i < num_objects; i++) {
-        saveFile >> type;
+    clear();
+
+    int object_count = 0;
+    save_file >> current_time;
+    save_file >> object_count;
+
+    for (int i = 0; i < object_count; ++i) {
+        char type = '?';
+        save_file >> type;
+
+        Person* person = nullptr;
         switch (type) {
             case 'P':
-                // objptr.add_at_back(new Peasant(this), iterator);
-                objptr.add_at_back(new Peasant(this));
+                person = new Peasant(this);
                 break;
             case 'S':
-                // objptr.add_at_back(new Soldier(this), iterator);
-                objptr.add_at_back(new Soldier(this));
+                person = new Soldier(this);
                 break;
             case 'A':
-                // objptr.add_at_back(new Archer(this), iterator);
-                objptr.add_at_back(new Archer(this));
+                person = new Archer(this);
+                break;
+            case 'O':
+                person = new Observer(this);
                 break;
             default:
-                // objptr.add_at_back(new Peasant(this), iterator);
-                objptr.add_at_back(new Peasant(this));
-                break;
+                cerr << "Unknown object code in save file: " << type << endl;
+                return;
         }
-        iterator.access_at_iterator()->restore(saveFile);
-        iterator.advance();
+
+        person->restore(save_file);
+        add_object(person);
     }
 
-    saveFile.close();
+    scan_iter.reset_from_list(obj_list);
 }
 
 void Game_World::clear() {
-    // 현재 게임 상의 모든 객체들을 위한 메모리를 시스템에 반환하고
-    // 포인터 배열의 모든 원소의 값을 NULL로 리셋하고, 객체의 개수를 0으로 설정한다.
-    // for (int i = 0; i < max_num_objects; i++) {
-    //     if (objptr[i] != nullptr) {
-    //         delete objptr[i];
-    //         objptr[i] = nullptr;
-    //     }
-    // }
-    objptr.clear();
-    num_objects = 0;
+    Linked_List_Iterator<Person*> iter(obj_list);
+    while (!iter.at_end()) {
+        Person* person = iter.access_at_iterator();
+        delete person;
+        iter.remove_at_iterator();
+    }
+    scan_iter.reset_from_list(obj_list);
 }

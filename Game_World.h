@@ -1,30 +1,36 @@
-
-
 #ifndef __GAME_WORLD__
 #define __GAME_WORLD__
 
 #include "LinkedList.h"
 
-class Game_World {
-private:
-    // Person * objptr[10];
-    Linked_List<Person*> objptr;
-    Linked_List_Iterator<Person*> iterator;
-    // int max_num_objects; // 생성할 수 있는 객체의 총 개수, 기본값 10
-    int num_objects; // 현재 존재하는 객체의 수, 기본값 0
+class BoardView;
+class Person;
 
+class Game_World {
 public:
-    Game_World(); // 기본 생성자, 멤버 변수들 초기화
+    Game_World();
     ~Game_World();
-    int get_num_objects() { return num_objects; } // 포인터 배열이 현재 가리키는 객체의 개수를 반환한다.
-    void set_num_objects(int num);
-    // bool has_space(); // 추가의 객체를 위한 포인터를 저장할 장소가 배열에 남아 있는지 점검하여 true/false를 반환한다.
-    // Person * get_object_ptr(int i) { return objptr[i]; }// ID가 i인 객체의 포인터를 반환한다.
-    Person* get_object_ptr(int id); // ID가 id인 객체의 포인터를 반환한다.
-    void add_object(Person* ptr);   // 원래는 bool 타입이였음, 임의로 void로 타입 변경함.
+
+    int get_num_objects() const { return obj_list.get_list_length(); }
+    int get_time() const { return current_time; }
+    int get_new_ID() const;
+
+    Person* get_object_ptr(int id) const;
+    void add_object(Person* ptr);
+    void display_all_objects();
+    void update_all_objects();
+    void generate_display(BoardView& board) const;
+    void start_scan();
+    Person* get_next_scan_ptr();
+    void advance_time() { ++current_time; }
     void save();
-    void restore(); // 원래 bool 타입이였는데 void로 바꿈
+    void restore();
     void clear();
+
+private:
+    Linked_List<Person*> obj_list;
+    mutable Linked_List_Iterator<Person*> scan_iter;
+    int current_time;
 };
 
 #endif // __GAME_WORLD__
